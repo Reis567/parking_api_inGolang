@@ -5,7 +5,10 @@ import (
     "log"
     "os"
 
+    "github.com/gin-gonic/gin"
     "github.com/joho/godotenv"
+    "meu-novo-projeto/src/controller/routes"
+    "meu-novo-projeto/src/middleware"
 )
 
 func main() {
@@ -17,8 +20,22 @@ func main() {
 
     // Usar as variáveis de ambiente
     appPort := os.Getenv("APP_PORT")
-    dbURL := os.Getenv("DATABASE_URL")
+    if appPort == "" {
+        log.Fatal("A porta da aplicação (APP_PORT) não está definida no arquivo .env")
+    }
 
-    fmt.Printf("Aplicação rodando na porta %s\n", appPort)
-    fmt.Printf("Conectando ao banco de dados em %s\n", dbURL)
+    // Configurar o servidor Gin
+    router := gin.Default()
+
+    // Aplicar middleware de erros
+    router.Use(middleware.ErrorHandlingMiddleware())
+
+    // Inicializar rotas
+    api := router.Group("/api/v1")
+    routes.InitRoutes(api)
+
+    // Rodar a aplicação e tratar erro de inicialização
+    if err := router.Run(fmt.Sprintf(":%s", appPort)); err != nil {
+        log.Fatalf("Erro ao iniciar o servidor: %v", err)
+    }
 }
