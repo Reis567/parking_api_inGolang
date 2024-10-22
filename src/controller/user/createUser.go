@@ -9,13 +9,21 @@ import (
 )
 
 func CreateUser(c *gin.Context) {
-   var userRequest request.UserRequest
-   if err := c.ShouldBindJSON(&userRequest); err != nil{
-		restErr := rest_err.NewBadRequestError(
-			fmt.Sprintf("There are some incorrect fields, erro=%s",err)
+    var userRequest request.UserRequest
+    // Tentar fazer o binding do JSON para o struct UserRequest
+    if err := c.ShouldBindJSON(&userRequest); err != nil {
+        restErr := rest_err.NewBadRequestError(
+			fmt.Sprintf("There are some incorrect fields, erro=%s",err),
 		)
-		c.JSON(restErr.Code,restErr)
-		return
-   }
-   fmt.Println(userRequest)
+        c.JSON(restErr.Code, restErr)
+        return
+    }
+
+
+    fmt.Println(userRequest)
+
+    c.JSON(201, gin.H{
+        "message": "Usuário criado com sucesso!",
+        "user":    userRequest,
+    })
 }
