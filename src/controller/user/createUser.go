@@ -1,12 +1,14 @@
 package user
 
 import (
-    "fmt"
-    "meu-novo-projeto/src/configuration/rest_err"
-    "meu-novo-projeto/src/controller/model/request"
-    "github.com/go-playground/validator/v10"
+	"fmt"
+	"meu-novo-projeto/src/configuration/rest_err"
+	"meu-novo-projeto/src/configuration/validation"
+	"meu-novo-projeto/src/controller/model/request"
 
-    "github.com/gin-gonic/gin"
+	"github.com/go-playground/validator/v10"
+
+	"github.com/gin-gonic/gin"
 )
 
 // Instancia do validador
@@ -17,18 +19,14 @@ func CreateUser(c *gin.Context) {
     var userRequest request.UserRequest
     // Tentar fazer o binding do JSON para o struct UserRequest
     if err := c.ShouldBindJSON(&userRequest); err != nil {
-        restErr := rest_err.NewBadRequestError(
-            fmt.Sprintf("Existem campos incorretos, erro=%s", err),
-        )
+        restErr := validation.VaidateUserError(err)
         c.JSON(restErr.Code, restErr)
         return
     }
 
     // Validar os dados usando o validator
     if err := validate.Struct(userRequest); err != nil {
-        restErr := rest_err.NewBadRequestError(
-            fmt.Sprintf("Erro de validação: %s", err),
-        )
+        restErr := validation.VaidateUserError(err)
         c.JSON(restErr.Code, restErr)
         return
     }
