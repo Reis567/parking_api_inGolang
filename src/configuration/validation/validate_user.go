@@ -1,6 +1,10 @@
 package validation
 
 import (
+	"encoding/json"
+	"errors"
+	"meu-novo-projeto/src/configuration/rest_err"
+
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
@@ -20,5 +24,29 @@ func init () {
 		unt := ut.New(en,en)
 		transl,_ = unt.GetTranslator("en")
 		en_translation.RegisterDefaultTranslations(val,transl)
+	}
+}
+
+func VaidateUserError(
+	validation_err error,
+) *rest_err.RestErr{
+	var jsonErr *json.UnmarshalTypeError
+	var jsonVaidationError validator.ValidationErrors
+
+	if errors.As(validation_err, &jsonErr){
+		return rest_err.NewBadRequestError("Invalid field type")
+	} else if errors.As(validation_err, &jsonVaidationError) {
+		errorCauses := []rest_err.Causes{}
+
+		for _,e := range validation_err.(validator.ValidationErrors){
+			cause := rest_err.Causes{
+				Message: e.Translate(transl),
+				Field: e.Field(),
+			}
+			errorCauses = append(errorCauses, cause)
+		}
+		return rest_err.NewBadRequestValidationError("Some fields are invalid !",errorCauses)
+	}else{
+		return rest_err.NewBadRequestError("Error trying to convert fields ")
 	}
 }

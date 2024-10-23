@@ -28,6 +28,14 @@ func NewBadRequestError(message string) *RestErr {
         Code:    http.StatusBadRequest,
     }
 }
+func NewBadRequestValidationError(message string, causes []Causes) *RestErr {
+    return &RestErr{
+        Message: message,
+        Err:     "bad_request",
+        Code:    http.StatusBadRequest,
+        Causes:  causes,
+    }
+}
 
 // Função para criar um erro de Unauthorized (401)
 func NewUnauthorizedError(message string) *RestErr {
