@@ -3,7 +3,6 @@ package user
 import (
 	"fmt"
 	"meu-novo-projeto/src/configuration/logger"
-	"meu-novo-projeto/src/configuration/rest_err"
 	"meu-novo-projeto/src/configuration/validation"
 	"meu-novo-projeto/src/controller/model/request"
 	"go.uber.org/zap"
