@@ -13,7 +13,7 @@ var (
 )
 
 func init() {
-	// Configurar o encoder para o console
+
 	encoderConfig := zapcore.EncoderConfig{
 		TimeKey:        "timestamp",
 		LevelKey:       "level",
@@ -28,11 +28,9 @@ func init() {
 		EncodeCaller:   zapcore.ShortCallerEncoder,       // Arquivo e linha de onde veio o log
 	}
 
-	// Definir o nível e destino de saída a partir das variáveis de ambiente
 	logLevel := getLogLevel()
 	logOutput := getLogOutput()
 
-	// Definir o Syncer de saída de log
 	var syncer zapcore.WriteSyncer
 	if logOutput == "stdout" {
 		syncer = zapcore.AddSync(os.Stdout)
@@ -57,6 +55,18 @@ func init() {
 	Logger = zap.New(core, zap.AddCaller(), zap.AddStacktrace(zapcore.ErrorLevel))
 
 	defer Logger.Sync() // Sincronizar antes de sair
+}
+
+// Info registra uma mensagem de nível informativo
+func Info(message string, fields ...zap.Field) {
+	Logger.Info(message, fields...)
+	Logger.Sync() // Garante que a mensagem seja enviada imediatamente
+}
+
+// Error registra uma mensagem de nível de erro
+func Error(message string, fields ...zap.Field) {
+	Logger.Error(message, fields...)
+	Logger.Sync() // Garante que a mensagem seja enviada imediatamente
 }
 
 // GetLogger retorna a instância do logger
