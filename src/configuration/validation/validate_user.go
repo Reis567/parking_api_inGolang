@@ -27,7 +27,7 @@ func init () {
 	}
 }
 
-func VaidateUserError(
+func ValidateUserError(
 	validation_err error,
 ) *rest_err.RestErr{
 	var jsonErr *json.UnmarshalTypeError

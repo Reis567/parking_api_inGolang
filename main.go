@@ -1,18 +1,20 @@
 package main
 
 import (
-    "fmt"
-    "log"
-    "os"
+	"fmt"
+	"log"
+	"os"
 
-    "github.com/gin-gonic/gin"
-    "github.com/joho/godotenv"
-    "meu-novo-projeto/src/controller/routes"
-    "meu-novo-projeto/src/middleware"
+	"meu-novo-projeto/src/configuration/logger"
+	"meu-novo-projeto/src/controller/routes"
+	"meu-novo-projeto/src/middleware"
+
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-    // Carregar variáveis do .env
+    logger.Info("About to start application")
     err := godotenv.Load()
     if err != nil {
         log.Fatalf("Erro ao carregar o arquivo .env: %v", err)
