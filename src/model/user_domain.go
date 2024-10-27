@@ -1,6 +1,10 @@
 package model
 
-import "meu-novo-projeto/src/configuration/rest_err"
+import (
+	"crypto/md5"
+	"encoding/hex"
+	"meu-novo-projeto/src/configuration/rest_err"
+)
 
 // UserDomain representa a estrutura de um usuário no sistema
 type UserDomain struct {
@@ -14,7 +18,14 @@ type UserDomain struct {
 	UpdatedAt string
 }
 
-// UserDomainInterface define os métodos para operações de usuário
+func (ud *UserDomain) EncryptPassword() {
+	hash:= md5.New()
+	defer hash.Reset()
+	hash.Write([]byte(ud.Password))
+	ud.Password=hex.EncodeToString(hash.Sum(nil))
+}
+
+
 type UserDomainInterface interface {
 	CreateUser(user UserDomain) (*UserDomain, *rest_err.RestErr)
 	FindUserByID(id string) (*UserDomain, *rest_err.RestErr)
