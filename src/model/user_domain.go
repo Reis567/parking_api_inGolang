@@ -3,7 +3,9 @@ package model
 import (
 	"crypto/md5"
 	"encoding/hex"
+
 	"meu-novo-projeto/src/configuration/rest_err"
+	"time"
 )
 
 // UserDomain representa a estrutura de um usuário no sistema
@@ -16,6 +18,21 @@ type UserDomain struct {
 	Age       int8
 	CreatedAt string
 	UpdatedAt string
+}
+
+func NewUserDomain(firstName, lastName, email, password string, age int8) UserDomainInterface {
+	user := &UserDomain{
+		ID:        generateID(),                            // Gerar um ID único
+		FirstName: firstName,
+		LastName:  lastName,
+		Email:     email,
+		Password:  password,
+		Age:       age,
+		CreatedAt: time.Now().Format(time.RFC3339),         // Definir data de criação
+		UpdatedAt: time.Now().Format(time.RFC3339),         // Definir data de atualização
+	}
+	user.EncryptPassword() // Encripta a senha automaticamente
+	return user
 }
 
 func (ud *UserDomain) EncryptPassword() {
