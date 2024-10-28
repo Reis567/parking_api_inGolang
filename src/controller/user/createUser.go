@@ -1,9 +1,9 @@
 package user
 
 import (
-	"fmt"
 	"meu-novo-projeto/src/configuration/logger"
 	"meu-novo-projeto/src/configuration/validation"
+	"meu-novo-projeto/src/controller/model"
 	"meu-novo-projeto/src/controller/model/request"
 	"go.uber.org/zap"
 	"github.com/go-playground/validator/v10"
@@ -12,6 +12,9 @@ import (
 
 // Instancia do validador
 var validate = validator.New()
+
+// Variável de domínio para acessar os métodos do UserDomainInterface
+var domain = model.NewUserDomain("", "", "", "", 0) // Inicialização básica, substituída ao criar usuário
 
 // CreateUser é responsável por criar um novo usuário
 func CreateUser(c *gin.Context) {
@@ -34,15 +37,22 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	// Simulação de lógica para criar o usuário
-	fmt.Println(userRequest)
+	// Criar o usuário usando o domain
+	domain = model.NewUserDomain(userRequest.FirstName, userRequest.LastName, userRequest.Email, userRequest.Password, userRequest.Age)
+	createdUser, err := domain.CreateUser(*domain.(*model.UserDomain)) // Garantindo que seja o tipo correto
+
+	if err != nil {
+		logger.Error("Erro ao criar o usuário", zap.Error(err))
+		c.JSON(err.Code, err)
+		return
+	}
 
 	// Log de sucesso ao criar o usuário
-	logger.Info("Usuário criado com sucesso", zap.String("user_email", userRequest.Email))
+	logger.Info("Usuário criado com sucesso", zap.String("user_email", createdUser.Email))
 
 	// Retornar resposta de sucesso
 	c.JSON(201, gin.H{
 		"message": "Usuário criado com sucesso!",
-		"user":    userRequest,
+		"user":    createdUser,
 	})
 }
