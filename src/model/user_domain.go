@@ -3,21 +3,21 @@ package model
 import (
 	"crypto/md5"
 	"encoding/hex"
-
-	"meu-novo-projeto/src/configuration/rest_err"
+	"fmt"
 	"time"
+
 )
 
-// UserDomain representa a estrutura de um usuário no sistema
-type UserDomain struct {
-	ID        string
-	FirstName string
-	LastName  string
-	Email     string
-	Password  string
-	Age       int8
-	CreatedAt string
-	UpdatedAt string
+// UserDomainInterface define os métodos de acesso para UserDomain
+type UserDomainInterface interface {
+	GetID() string
+	GetFirstName() string
+	GetLastName() string
+	GetEmail() string
+	GetPassword() string
+	GetAge() int8
+	GetCreatedAt() string
+	GetUpdatedAt() string
 }
 
 // NewUserDomain é o construtor que cria uma nova instância de UserDomain e retorna UserDomainInterface
@@ -34,6 +34,23 @@ func NewUserDomain(firstName, lastName, email, password string, age int8) UserDo
 	}
 	user.EncryptPassword() // Encripta a senha automaticamente
 	return user
+}
+
+// UserDomain representa a estrutura de um usuário no sistema
+type UserDomain struct {
+	ID        string
+	FirstName string
+	LastName  string
+	Email     string
+	Password  string
+	Age       int8
+	CreatedAt string
+	UpdatedAt string
+}
+
+// Função para gerar um ID único
+func generateID() string {
+	return fmt.Sprintf("%d", time.Now().UnixNano())
 }
 
 // Métodos Get para cada campo da estrutura UserDomain
@@ -75,22 +92,4 @@ func (ud *UserDomain) EncryptPassword() {
 	defer hash.Reset()
 	hash.Write([]byte(ud.Password))
 	ud.Password = hex.EncodeToString(hash.Sum(nil))
-}
-
-
-// Interface de UserDomain com operações de CRUD
-type UserDomainInterface interface {
-	CreateUser(user UserDomain) (*UserDomain, *rest_err.RestErr)
-	FindUserByID(id string) (*UserDomain, *rest_err.RestErr)
-	FindUserByEmail(email string) (*UserDomain, *rest_err.RestErr)
-	UpdateUser(user UserDomain) (*UserDomain, *rest_err.RestErr)
-	DeleteUser(id string) *rest_err.RestErr
-	GetID() string
-	GetFirstName() string
-	GetLastName() string
-	GetEmail() string
-	GetPassword() string
-	GetAge() int8
-	GetCreatedAt() string
-	GetUpdatedAt() string
 }

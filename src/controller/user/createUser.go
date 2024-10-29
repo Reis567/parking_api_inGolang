@@ -3,18 +3,18 @@ package user
 import (
 	"meu-novo-projeto/src/configuration/logger"
 	"meu-novo-projeto/src/configuration/validation"
-	"meu-novo-projeto/src/controller/model"
+	"meu-novo-projeto/src/model"
+	"meu-novo-projeto/src/model/service"
 	"meu-novo-projeto/src/controller/model/request"
 	"go.uber.org/zap"
 	"github.com/go-playground/validator/v10"
 	"github.com/gin-gonic/gin"
 )
 
-// Instancia do validador
-var validate = validator.New()
-
-// Variável de domínio para acessar os métodos do UserDomainInterface
-var domain = model.NewUserDomain("", "", "", "", 0) // Inicialização básica, substituída ao criar usuário
+var (
+	validate = validator.New()
+	domain   = service.NewUserDomainService() // Instância de serviço de domínio de usuário
+)
 
 // CreateUser é responsável por criar um novo usuário
 func CreateUser(c *gin.Context) {
@@ -37,9 +37,9 @@ func CreateUser(c *gin.Context) {
 		return
 	}
 
-	// Criar o usuário usando o domain
-	domain = model.NewUserDomain(userRequest.FirstName, userRequest.LastName, userRequest.Email, userRequest.Password, userRequest.Age)
-	createdUser, err := domain.CreateUser(*domain.(*model.UserDomain)) // Garantindo que seja o tipo correto
+	// Criar o usuário usando o serviço de domínio
+	user := model.NewUserDomain(userRequest.FirstName, userRequest.LastName, userRequest.Email, userRequest.Password, userRequest.Age)
+	createdUser, err := domain.CreateUser(user)
 
 	if err != nil {
 		logger.Error("Erro ao criar o usuário", zap.Error(err))
@@ -48,11 +48,19 @@ func CreateUser(c *gin.Context) {
 	}
 
 	// Log de sucesso ao criar o usuário
-	logger.Info("Usuário criado com sucesso", zap.String("user_email", createdUser.Email))
+	logger.Info("Usuário criado com sucesso", zap.String("user_email", createdUser.GetEmail()))
 
 	// Retornar resposta de sucesso
 	c.JSON(201, gin.H{
 		"message": "Usuário criado com sucesso!",
-		"user":    createdUser,
+		"user": gin.H{
+			"id":         createdUser.GetID(),
+			"first_name": createdUser.GetFirstName(),
+			"last_name":  createdUser.GetLastName(),
+			"email":      createdUser.GetEmail(),
+			"age":        createdUser.GetAge(),
+			"created_at": createdUser.GetCreatedAt(),
+			"updated_at": createdUser.GetUpdatedAt(),
+		},
 	})
 }
