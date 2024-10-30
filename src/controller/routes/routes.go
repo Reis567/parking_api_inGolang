@@ -1,17 +1,22 @@
 package routes
 
 import (
-    "github.com/gin-gonic/gin"
     "meu-novo-projeto/src/controller/user"
+    "meu-novo-projeto/src/model/service"
+    "github.com/gin-gonic/gin"
 )
 
 func InitRoutes(r *gin.RouterGroup) {
+    // Instancia o serviço e o controlador
+    userService := service.NewUserDomainService()
+    userController := user.NewUserControllerInterface(userService)
+
     userRoutes := r.Group("/users")
     {
-        userRoutes.POST("/", user.CreateUser)
-        userRoutes.GET("/:id", user.FindUserByID)
-        userRoutes.GET("/email/:email", user.FindUserByEmail)
-        userRoutes.PUT("/:id", user.UpdateUser)
-        userRoutes.DELETE("/:id", user.DeleteUser)
+        userRoutes.POST("/", userController.CreateUser)
+        userRoutes.GET("/:id", userController.FindUserByID)
+        userRoutes.GET("/email/:email", userController.FindUserByEmail)
+        userRoutes.PUT("/:id", userController.UpdateUser)
+        userRoutes.DELETE("/:id", userController.DeleteUser)
     }
 }
