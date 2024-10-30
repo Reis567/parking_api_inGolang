@@ -17,7 +17,7 @@ var (
 )
 
 // CreateUser é responsável por criar um novo usuário
-func CreateUser(c *gin.Context) {
+func (uc *userControllerInterface) CreateUser(c *gin.Context) {
 	var userRequest request.UserRequest
 	logger.Info("Iniciando CreateUserController")
 
