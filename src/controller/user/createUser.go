@@ -4,7 +4,7 @@ import (
 	"meu-novo-projeto/src/configuration/logger"
 	"meu-novo-projeto/src/configuration/validation"
 	"meu-novo-projeto/src/model"
-	"meu-novo-projeto/src/model/service"
+
 	"meu-novo-projeto/src/controller/model/request"
 	"go.uber.org/zap"
 	"github.com/go-playground/validator/v10"
@@ -13,7 +13,7 @@ import (
 
 var (
 	validate = validator.New()
-	domain   = service.NewUserDomainService() // Instância de serviço de domínio de usuário
+
 )
 
 // CreateUser é responsável por criar um novo usuário
@@ -39,7 +39,7 @@ func (uc *userControllerInterface) CreateUser(c *gin.Context) {
 
 	// Criar o usuário usando o serviço de domínio
 	user := model.NewUserDomain(userRequest.FirstName, userRequest.LastName, userRequest.Email, userRequest.Password, userRequest.Age)
-	createdUser, err := domain.CreateUser(user)
+	createdUser, err := uc.service.CreateUser(user)
 
 	if err != nil {
 		logger.Error("Erro ao criar o usuário", zap.Error(err))
