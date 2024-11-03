@@ -3,6 +3,7 @@ package repository
 import (
 	"database/sql" // Importação necessária para usar *sql.DB
 	"log"
+	"fmt"
 
 	"meu-novo-projeto/src/configuration/database"
 	"meu-novo-projeto/src/configuration/rest_err"
@@ -28,6 +29,15 @@ func (r *userRepository) CreateUser(user model.UserDomainInterface) (model.UserD
 		user.GetPassword(), user.GetAge(), user.GetCreatedAt(), user.GetUpdatedAt())
 	if err != nil {
 		log.Printf("Erro ao inserir usuário no banco de dados: %v", err)
+
+		// Logar o valor do JSON do usuário em caso de erro
+		jsonValue, jsonErr := user.GetJSONValue()
+		if jsonErr != nil {
+			log.Printf("Erro ao converter usuário para JSON: %v", jsonErr)
+		} else {
+			log.Printf("Dados do usuário: %s", jsonValue)
+		}
+
 		return nil, rest_err.NewInternalServerError("Erro ao criar usuário", err)
 	}
 
