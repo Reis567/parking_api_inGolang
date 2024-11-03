@@ -3,8 +3,6 @@ package repository
 import (
 	"database/sql" // Importação necessária para usar *sql.DB
 	"log"
-	"fmt"
-
 	"meu-novo-projeto/src/configuration/database"
 	"meu-novo-projeto/src/configuration/rest_err"
 	"meu-novo-projeto/src/model"
@@ -22,6 +20,9 @@ func NewUserRepository() UserRepository {
 
 // CreateUser insere um novo usuário no banco de dados
 func (r *userRepository) CreateUser(user model.UserDomainInterface) (model.UserDomainInterface, *rest_err.RestErr) {
+	// Atribuir um novo ID ao usuário
+	user.SetID(model.GenerateID())
+
 	query := `INSERT INTO users (id, first_name, last_name, email, password, age, created_at, updated_at) 
 	          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 

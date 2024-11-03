@@ -20,12 +20,13 @@ type UserDomainInterface interface {
 	GetUpdatedAt() string
 	GetJSONValue() (string, error)
 	SetID(id string)
+
 }
 
 // NewUserDomain é o construtor que cria uma nova instância de UserDomain e retorna UserDomainInterface
 func NewUserDomain(firstName, lastName, email, password string, age int8) UserDomainInterface {
 	user := &UserDomain{
-		ID:        generateID(),                            // Gerar um ID único
+		ID:        GenerateID(),                            // Gerar um ID único
 		FirstName: firstName,
 		LastName:  lastName,
 		Email:     email,
@@ -51,7 +52,7 @@ type UserDomain struct {
 }
 
 // Função para gerar um ID único
-func generateID() string {
+func GenerateID() string {
 	return fmt.Sprintf("%d", time.Now().UnixNano())
 }
 
