@@ -6,7 +6,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
-
 )
 
 // UserDomainInterface define os métodos de acesso para UserDomain
@@ -20,6 +19,7 @@ type UserDomainInterface interface {
 	GetCreatedAt() string
 	GetUpdatedAt() string
 	GetJSONValue() (string, error)
+	SetID(id string)
 }
 
 // NewUserDomain é o construtor que cria uma nova instância de UserDomain e retorna UserDomainInterface
@@ -40,15 +40,14 @@ func NewUserDomain(firstName, lastName, email, password string, age int8) UserDo
 
 // UserDomain representa a estrutura de um usuário no sistema
 type UserDomain struct {
-    ID        string `json:"id"`
-    FirstName string `json:"first_name"`
-    LastName  string `json:"last_name"`
-    Email     string `json:"email"`
-    Password  string `json:"-"`
-    CreatedAt string `json:"created_at"`
-    UpdatedAt string `json:"updated_at"`
-	Age       int8 `json:"age"`
-
+	ID        string `json:"id"`
+	FirstName string `json:"first_name"`
+	LastName  string `json:"last_name"`
+	Email     string `json:"email"`
+	Password  string `json:"-"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+	Age       int8   `json:"age"`
 }
 
 // Função para gerar um ID único
@@ -97,11 +96,15 @@ func (ud *UserDomain) EncryptPassword() {
 	ud.Password = hex.EncodeToString(hash.Sum(nil))
 }
 
-
 func (ud *UserDomain) GetJSONValue() (string, error) {
 	jsonData, err := json.Marshal(ud)
 	if err != nil {
 		return "", fmt.Errorf("erro ao converter UserDomain para JSON: %w", err)
 	}
 	return string(jsonData), nil
+}
+
+// SetID define o ID do UserDomain
+func (ud *UserDomain) SetID(id string) {
+	ud.ID = id
 }
