@@ -3,14 +3,17 @@ package service
 import (
 	"meu-novo-projeto/src/configuration/rest_err"
 	"meu-novo-projeto/src/model"
+	"meu-novo-projeto/src/model/repository"
 )
 
 // NewUserDomainService cria uma instância de userDomainService
-func NewUserDomainService() UserDomainService {
-	return &userDomainService{}
+func NewUserDomainService( userRepository repository.UserRepository ) UserDomainService {
+	return &userDomainService{userRepository}
 }
 
-type userDomainService struct{}
+type userDomainService struct{
+	userRepository repository.UserRepository
+}
 
 // Interface do serviço de domínio do usuário
 type UserDomainService interface {
