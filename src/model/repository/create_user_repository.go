@@ -6,6 +6,7 @@ import (
 	"meu-novo-projeto/src/configuration/database"
 	"meu-novo-projeto/src/configuration/rest_err"
 	"meu-novo-projeto/src/model"
+
 )
 
 // userRepository é uma estrutura que implementa a interface UserRepository

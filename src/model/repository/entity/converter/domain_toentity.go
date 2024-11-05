@@ -1,4 +1,4 @@
-package entity
+package converter
 
 import (
 	"meu-novo-projeto/src/model"
