@@ -8,6 +8,8 @@ import (
 	"meu-novo-projeto/src/configuration/database"
 	"meu-novo-projeto/src/configuration/logger"
 	"meu-novo-projeto/src/controller/routes"
+	"meu-novo-projeto/src/controller/user"
+	"meu-novo-projeto/src/model/service"
 	"meu-novo-projeto/src/middleware"
 
 	"github.com/gin-gonic/gin"
@@ -37,6 +39,10 @@ func main() {
 		log.Fatal("A porta da aplicação (APP_PORT) não está definida no arquivo .env")
 	}
 
+	// Instanciar o serviço e o controlador de usuários
+	userService := service.NewUserDomainService()
+	userController := user.NewUserControllerInterface(userService)
+
 	// Configurar o servidor Gin
 	router := gin.Default()
     router.SetTrustedProxies([]string{"127.0.0.1"})
@@ -44,9 +50,9 @@ func main() {
 	// Aplicar middleware de erros
 	router.Use(middleware.ErrorHandlingMiddleware())
 
-	// Inicializar rotas
+	// Inicializar rotas com as dependências
 	api := router.Group("/api/v1")
-	routes.InitRoutes(api)
+	routes.InitRoutes(api, userController)
 
 	// Rodar a aplicação e tratar erro de inicialização
 	if err := router.Run(fmt.Sprintf(":%s", appPort)); err != nil {
