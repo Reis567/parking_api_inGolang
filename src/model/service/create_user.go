@@ -21,10 +21,15 @@ func (s *userDomainService) CreateUser(user model.UserDomainInterface) (model.Us
 
 	// Encriptar a senha
 	user.(*model.UserDomain).EncryptPassword()
+	userDomainRepository , err := s.userRepository.CreateUser(user)
+	if err != nil {
+		logger.Error("Erro ao salvar usuário no banco de dados", zap.Error(err))
+		return nil, err
+	}
 
 	// Log e retorno do usuário criado (simulação)
 	logger.Info("Usuário criado com sucesso", zap.String("user_id", user.GetID()))
-	return user, nil
+	return userDomainRepository, nil
 }
 
 // Exemplo de função para geração de ID
