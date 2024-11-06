@@ -9,8 +9,9 @@ import (
 	"meu-novo-projeto/src/configuration/logger"
 	"meu-novo-projeto/src/controller/routes"
 	"meu-novo-projeto/src/controller/user"
-	"meu-novo-projeto/src/model/service"
 	"meu-novo-projeto/src/middleware"
+	"meu-novo-projeto/src/model/repository"
+	"meu-novo-projeto/src/model/service"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -39,8 +40,8 @@ func main() {
 		log.Fatal("A porta da aplicação (APP_PORT) não está definida no arquivo .env")
 	}
 
-	// Instanciar o serviço e o controlador de usuários
-	userService := service.NewUserDomainService()
+	repo := repository.NewUserRepository()
+	userService := service.NewUserDomainService(repo)
 	userController := user.NewUserControllerInterface(userService)
 
 	// Configurar o servidor Gin
