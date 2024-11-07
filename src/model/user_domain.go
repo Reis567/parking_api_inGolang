@@ -9,7 +9,7 @@ import (
 )
 
 // UserDomainInterface define os métodos de acesso para UserDomain
-type UserDomainInterface interface {
+type UserDomainInterface interface {	
 	GetID() string
 	GetFirstName() string
 	GetLastName() string
