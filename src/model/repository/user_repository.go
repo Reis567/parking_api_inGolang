@@ -7,4 +7,5 @@ import (
 
 type UserRepository interface {
 	CreateUser(userDomain model.UserDomainInterface) (model.UserDomainInterface ,*rest_err.RestErr)
+	FindUserByEmail(userDomain model.UserDomainInterface) (model.UserDomainInterface ,*rest_err.RestErr)
 }
