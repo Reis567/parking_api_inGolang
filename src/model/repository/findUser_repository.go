@@ -6,5 +6,5 @@ import (
 )
 
 func (us *userRepository) FindUserByEmail(email string) (model.UserDomainInterface *rest_err.RestErr) {
-
+	return nil,nil
 }
