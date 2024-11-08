@@ -3,8 +3,36 @@ package repository
 import (
 	"meu-novo-projeto/src/configuration/rest_err"
 	"meu-novo-projeto/src/model"
+	"meu-novo-projeto/src/model/repository/entity"
+	"meu-novo-projeto/src/model/repository/entity/converter"
+	"database/sql"
+	"log"
 )
 
-func (us *userRepository) FindUserByEmail(email string) (model.UserDomainInterface *rest_err.RestErr) {
-	return nil,nil
+func (r *userRepository) FindUserByEmail(email string) (model.UserDomainInterface, *rest_err.RestErr) {
+	query := `SELECT id, first_name, last_name, email, password, age, created_at, updated_at FROM users WHERE email = ?`
+
+	row := r.db.QueryRow(query, email)
+
+	var userEntity entity.UserEntity
+	err := row.Scan(
+		&userEntity.ID,
+		&userEntity.FirstName,
+		&userEntity.LastName,
+		&userEntity.Email,
+		&userEntity.Password,
+		&userEntity.Age,
+		&userEntity.CreatedAt,
+		&userEntity.UpdatedAt,
+	)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return nil, rest_err.NewNotFoundError("Usuário não encontrado")
+		}
+		log.Printf("Erro ao buscar usuário por email no banco de dados: %v", err)
+		return nil, rest_err.NewInternalServerError("Erro ao buscar usuário", err)
+	}
+
+	userDomain := converter.ConvertEntityToDomain(userEntity)
+	return userDomain, nil
 }

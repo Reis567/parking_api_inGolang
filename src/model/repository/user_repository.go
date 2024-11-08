@@ -6,6 +6,6 @@ import (
 )
 
 type UserRepository interface {
-	CreateUser(userDomain model.UserDomainInterface) (model.UserDomainInterface ,*rest_err.RestErr)
-	FindUserByEmail(userDomain model.UserDomainInterface) (model.UserDomainInterface ,*rest_err.RestErr)
+	CreateUser(userDomain model.UserDomainInterface) (model.UserDomainInterface, *rest_err.RestErr)
+	FindUserByEmail(email string) (model.UserDomainInterface, *rest_err.RestErr) // Corrigido para aceitar um string como parâmetro
 }

@@ -45,3 +45,4 @@ func (r *userRepository) CreateUser(user model.UserDomainInterface) (model.UserD
 
 	return user, nil
 }
+
