@@ -11,14 +11,13 @@ import (
 func (s *userDomainService) FindUserByID(id string) (model.UserDomainInterface, *rest_err.RestErr) {
 	logger.Info("Init FindUserByID service", zap.String("journey", "Find user by ID"))
 
-	// Simulação de busca (substituir pela lógica real de banco de dados)
-	// Aqui você implementaria a lógica para buscar o usuário pelo ID no banco de dados
-	if id == "" {
-		logger.Error("User not found", zap.String("user_id", id))
-		return nil, rest_err.NewNotFoundError("Usuário não encontrado")
+	// Consulta o repositório para buscar o usuário pelo ID
+	user, err := s.userRepository.FindUserByID(id)
+	if err != nil {
+		logger.Error("Erro ao buscar usuário no repositório", zap.Error(err))
+		return nil, err
 	}
 
-	user := model.NewUserDomain("John", "Doe", "johndoe@example.com", "password", 30) // Simulação de retorno
 	logger.Info("Usuário encontrado com sucesso", zap.String("user_id", id))
 	return user, nil
 }
@@ -27,14 +26,13 @@ func (s *userDomainService) FindUserByID(id string) (model.UserDomainInterface, 
 func (s *userDomainService) FindUserByEmail(email string) (model.UserDomainInterface, *rest_err.RestErr) {
 	logger.Info("Init FindUserByEmail service", zap.String("journey", "Find user by email"))
 
-	// Simulação de busca (substituir pela lógica real de banco de dados)
-	// Aqui você implementaria a lógica para buscar o usuário pelo email no banco de dados
-	if email == "" {
-		logger.Error("User not found", zap.String("user_email", email))
-		return nil, rest_err.NewNotFoundError("Usuário não encontrado")
+	// Consulta o repositório para buscar o usuário pelo email
+	user, err := s.userRepository.FindUserByEmail(email)
+	if err != nil {
+		logger.Error("Erro ao buscar usuário no repositório", zap.Error(err))
+		return nil, err
 	}
 
-	user := model.NewUserDomain("John", "Doe", email, "password", 30) // Simulação de retorno
 	logger.Info("Usuário encontrado com sucesso", zap.String("user_email", email))
 	return user, nil
 }
