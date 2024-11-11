@@ -39,7 +39,7 @@ func (uc *userControllerInterface) CreateUser(c *gin.Context) {
 
 	// Criar o usuário usando o serviço de domínio
 	user := model.NewUserDomain(userRequest.FirstName, userRequest.LastName, userRequest.Email, userRequest.Password, userRequest.Age)
-	createdUser, err := uc.service.CreateUser(user)
+	createdUser, err := uc.service.CreateUserService(user)
 
 	if err != nil {
 		logger.Error("Erro ao criar o usuário", zap.Error(err))

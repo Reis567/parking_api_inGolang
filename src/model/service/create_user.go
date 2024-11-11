@@ -11,7 +11,7 @@ import (
 )
 
 // CreateUser cria um novo usuário no sistema
-func (s *userDomainService) CreateUser(user model.UserDomainInterface) (model.UserDomainInterface, *rest_err.RestErr) {
+func (s *userDomainService) CreateUserService(user model.UserDomainInterface) (model.UserDomainInterface, *rest_err.RestErr) {
 	logger.Info("Init CreateUser model", zap.String("journey", "Create user"))
 
 	// Atribuir ID e datas

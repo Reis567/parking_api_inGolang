@@ -8,7 +8,7 @@ import (
 )
 
 // FindUserByID busca um usuário pelo ID
-func (s *userDomainService) FindUserByID(id string) (model.UserDomainInterface, *rest_err.RestErr) {
+func (s *userDomainService) FindUserByIDService(id string) (model.UserDomainInterface, *rest_err.RestErr) {
 	logger.Info("Init FindUserByID service", zap.String("journey", "Find user by ID"))
 
 	// Consulta o repositório para buscar o usuário pelo ID
@@ -23,7 +23,7 @@ func (s *userDomainService) FindUserByID(id string) (model.UserDomainInterface, 
 }
 
 // FindUserByEmail busca um usuário pelo email
-func (s *userDomainService) FindUserByEmail(email string) (model.UserDomainInterface, *rest_err.RestErr) {
+func (s *userDomainService) FindUserByEmailService(email string) (model.UserDomainInterface, *rest_err.RestErr) {
 	logger.Info("Init FindUserByEmail service", zap.String("journey", "Find user by email"))
 
 	// Consulta o repositório para buscar o usuário pelo email
