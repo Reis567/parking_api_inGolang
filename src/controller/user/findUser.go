@@ -12,7 +12,7 @@ func (uc *userControllerInterface) FindUserByEmail(c *gin.Context) {
 	logger.Info("Iniciando FindUserByEmailController", zap.String("email", email))
 
 	// Chama o serviço para buscar o usuário
-	user, err := uc.service.FindUserByEmail(email)
+	user, err := uc.service.FindUserByEmailService(email)
 	if err != nil {
 		logger.Error("Erro ao buscar usuário", zap.Error(err))
 		c.JSON(err.Code, err)
@@ -38,7 +38,7 @@ func (uc *userControllerInterface) FindUserByID(c *gin.Context) {
 	logger.Info("Iniciando FindUserByIDController", zap.String("user_id", userID))
 
 	// Chama o serviço para buscar o usuário
-	user, err := uc.service.FindUserByID(userID)
+	user, err := uc.service.FindUserByIDService(userID)
 	if err != nil {
 		logger.Error("Erro ao buscar usuário", zap.Error(err))
 		c.JSON(err.Code, err)
