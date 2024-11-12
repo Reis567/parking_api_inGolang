@@ -5,12 +5,23 @@ import (
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 	"github.com/google/uuid"
+	"net/mail"
 )
+
 
 // FindUserByEmail busca um usuário pelo email
 func (uc *userControllerInterface) FindUserByEmail(c *gin.Context) {
 	email := c.Param("email") // Obtenção do email a partir dos parâmetros da URL
 	logger.Info("Iniciando FindUserByEmailController", zap.String("email", email))
+
+	// Verifica se o email é válido usando mail.ParseAddress
+	if _, err := mail.ParseAddress(email); err != nil {
+		logger.Error("Email do usuário inválido", zap.String("email", email), zap.Error(err))
+		c.JSON(400, gin.H{
+			"message": "Email do usuário inválido. Por favor, forneça um email válido.",
+		})
+		return
+	}
 
 	// Chama o serviço para buscar o usuário
 	user, err := uc.service.FindUserByEmailService(email)
