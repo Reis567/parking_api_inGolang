@@ -4,6 +4,7 @@ import (
 	"meu-novo-projeto/src/configuration/logger"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
+	"github.com/google/uuid"
 )
 
 // FindUserByEmail busca um usuário pelo email
@@ -32,10 +33,18 @@ func (uc *userControllerInterface) FindUserByEmail(c *gin.Context) {
 }
 
 
-// FindUserByID busca um usuário pelo ID
 func (uc *userControllerInterface) FindUserByID(c *gin.Context) {
 	userID := c.Param("id") // Obtenção do ID a partir dos parâmetros da URL
 	logger.Info("Iniciando FindUserByIDController", zap.String("user_id", userID))
+
+	// Verifica se o ID é um UUID válido usando a biblioteca uuid
+	if _, err := uuid.Parse(userID); err != nil {
+		logger.Error("ID do usuário inválido", zap.String("user_id", userID), zap.Error(err))
+		c.JSON(400, gin.H{
+			"message": "ID do usuário inválido. Deve ser um UUID válido.",
+		})
+		return
+	}
 
 	// Chama o serviço para buscar o usuário
 	user, err := uc.service.FindUserByIDService(userID)
