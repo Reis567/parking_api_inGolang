@@ -2,12 +2,11 @@ package converter
 
 import (
 	"meu-novo-projeto/src/model"
-	"meu-novo-projeto/src/model/repository/entity"
 )
 
-// ConvertDomainToEntity converte um UserDomain para UserEntity
-func ConvertDomainToEntity(domain model.UserDomainInterface) entity.UserEntity {
-	return entity.UserEntity{
+// ConvertDomainToEntity converte um UserDomain para ser usado como entidade no GORM
+func ConvertDomainToEntity(domain model.UserDomainInterface) *model.UserDomain {
+	return &model.UserDomain{
 		ID:        domain.GetID(),
 		FirstName: domain.GetFirstName(),
 		LastName:  domain.GetLastName(),
