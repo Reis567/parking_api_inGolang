@@ -6,11 +6,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"time"
+
+
 )
 
-// UserDomainInterface define os métodos de acesso para UserDomain
 type UserDomainInterface interface {	
-	GetID() string
+	GetID() uint
 	GetFirstName() string
 	GetLastName() string
 	GetEmail() string
@@ -19,21 +20,18 @@ type UserDomainInterface interface {
 	GetCreatedAt() string
 	GetUpdatedAt() string
 	GetJSONValue() (string, error)
-	SetID(id string)
-
+	SetID(id uint)
 }
 
-// NewUserDomain é o construtor que cria uma nova instância de UserDomain e retorna UserDomainInterface
 func NewUserDomain(firstName, lastName, email, password string, age int8) UserDomainInterface {
 	user := &UserDomain{
-		ID:        GenerateID(),                            // Gerar um ID único
 		FirstName: firstName,
 		LastName:  lastName,
 		Email:     email,
 		Password:  password,
 		Age:       age,
-		CreatedAt: time.Now().Format(time.RFC3339),         // Definir data de criação
-		UpdatedAt: time.Now().Format(time.RFC3339),         // Definir data de atualização
+		CreatedAt: time.Now().Format(time.RFC3339),
+		UpdatedAt: time.Now().Format(time.RFC3339),
 	}
 	user.EncryptPassword() // Encripta a senha automaticamente
 	return user
@@ -41,23 +39,23 @@ func NewUserDomain(firstName, lastName, email, password string, age int8) UserDo
 
 // UserDomain representa a estrutura de um usuário no sistema
 type UserDomain struct {
-	ID        string `json:"id"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Email     string `json:"email"`
-	Password  string `json:"-"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
-	Age       int8   `json:"age"`
+	ID        uint           `gorm:"primaryKey" json:"id"`
+	FirstName string         `json:"first_name"`
+	LastName  string         `json:"last_name"`
+	Email     string         `json:"email" gorm:"unique"`
+	Password  string         `json:"-"`
+	CreatedAt string         `json:"created_at"`
+	UpdatedAt string         `json:"updated_at"`
+	Age       int8           `json:"age"`
 }
 
 // Função para gerar um ID único
-func GenerateID() string {
-	return fmt.Sprintf("%d", time.Now().UnixNano())
+func GenerateID() uint {
+	return uint(time.Now().UnixNano()) // ajustado para uint
 }
 
 // Métodos Get para cada campo da estrutura UserDomain
-func (ud *UserDomain) GetID() string {
+func (ud *UserDomain) GetID() uint {
 	return ud.ID
 }
 
@@ -89,7 +87,6 @@ func (ud *UserDomain) GetUpdatedAt() string {
 	return ud.UpdatedAt
 }
 
-// EncryptPassword encripta a senha do usuário usando MD5
 func (ud *UserDomain) EncryptPassword() {
 	hash := md5.New()
 	defer hash.Reset()
@@ -105,7 +102,6 @@ func (ud *UserDomain) GetJSONValue() (string, error) {
 	return string(jsonData), nil
 }
 
-// SetID define o ID do UserDomain
-func (ud *UserDomain) SetID(id string) {
+func (ud *UserDomain) SetID(id uint) {
 	ud.ID = id
 }
