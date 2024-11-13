@@ -23,7 +23,7 @@ func (r *userRepository) FindUserByEmail(email string) (model.UserDomainInterfac
 }
 
 // FindUserByID busca um usuário pelo ID
-func (r *userRepository) FindUserByID(id string) (model.UserDomainInterface, *rest_err.RestErr) {
+func (r *userRepository) FindUserByID(id uint) (model.UserDomainInterface, *rest_err.RestErr) {
 	var user model.UserDomain
 
 	// Buscar pelo campo 'id' usando GORM

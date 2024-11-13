@@ -8,7 +8,7 @@ import (
 )
 
 // FindUserByID busca um usuário pelo ID
-func (s *userDomainService) FindUserByIDService(id string) (model.UserDomainInterface, *rest_err.RestErr) {
+func (s *userDomainService) FindUserByIDService(id uint) (model.UserDomainInterface, *rest_err.RestErr) {
 	logger.Info("Init FindUserByID service", zap.String("journey", "Find user by ID"))
 
 	// Consulta o repositório para buscar o usuário pelo ID
@@ -18,7 +18,7 @@ func (s *userDomainService) FindUserByIDService(id string) (model.UserDomainInte
 		return nil, err
 	}
 
-	logger.Info("Usuário encontrado com sucesso", zap.String("user_id", id))
+	logger.Info("Usuário encontrado com sucesso", zap.Uint("user_id", id))
 	return user, nil
 }
 

@@ -4,7 +4,7 @@ import (
 	"meu-novo-projeto/src/configuration/logger"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"github.com/google/uuid"
+	"strconv" 
 	"net/mail"
 )
 
@@ -43,24 +43,24 @@ func (uc *userControllerInterface) FindUserByEmail(c *gin.Context) {
 	})
 }
 
-
 func (uc *userControllerInterface) FindUserByID(c *gin.Context) {
 	userID := c.Param("id") // Obtenção do ID a partir dos parâmetros da URL
 	logger.Info("Iniciando FindUserByIDController", zap.String("user_id", userID))
 
-	// Verifica se o ID é um UUID válido usando a biblioteca uuid
-	if _, err := uuid.Parse(userID); err != nil {
-		logger.Error("ID do usuário inválido", zap.String("user_id", userID), zap.Error(err))
+	// Converte o ID para uint
+	idUint, parseErr := strconv.ParseUint(userID, 10, 32)
+	if parseErr != nil {
+		logger.Error("ID do usuário inválido", zap.String("user_id", userID), zap.Error(parseErr))
 		c.JSON(400, gin.H{
-			"message": "ID do usuário inválido. Deve ser um UUID válido.",
+			"message": "ID do usuário inválido. Deve ser um número inteiro válido.",
 		})
 		return
 	}
 
 	// Chama o serviço para buscar o usuário
-	user, err := uc.service.FindUserByIDService(userID)
+	user, err := uc.service.FindUserByIDService(uint(idUint))
 	if err != nil {
-		logger.Error("Erro ao buscar usuário", zap.Error(err))
+		// Como err é do tipo *rest_err.RestErr, basta acessá-lo diretamente
 		c.JSON(err.Code, err)
 		return
 	}
@@ -76,3 +76,4 @@ func (uc *userControllerInterface) FindUserByID(c *gin.Context) {
 		"updated_at": user.GetUpdatedAt(),
 	})
 }
+
