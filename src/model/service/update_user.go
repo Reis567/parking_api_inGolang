@@ -10,7 +10,6 @@ import (
 	"go.uber.org/zap"
 )
 
-// UpdateUser atualiza um usuário existente
 func (s *userDomainService) UpdateUserService(user model.UserDomainInterface) (model.UserDomainInterface, *rest_err.RestErr) {
 	logger.Info("Init UpdateUser service", zap.String("journey", "Update user"))
 
@@ -21,16 +20,23 @@ func (s *userDomainService) UpdateUserService(user model.UserDomainInterface) (m
 		return nil, err
 	}
 
+	// Verifica se o retorno é do tipo esperado
+	userDomain, ok := existingUser.(*model.UserDomain)
+	if !ok {
+		logger.Error("Tipo inesperado ao buscar usuário para atualização")
+		return nil, rest_err.NewInternalServerError("Erro interno no sistema", nil)
+	}
+
 	// Atualizar os campos necessários
-	existingUser.(*model.UserDomain).FirstName = user.GetFirstName()
-	existingUser.(*model.UserDomain).LastName = user.GetLastName()
-	existingUser.(*model.UserDomain).Email = user.GetEmail()
-	existingUser.(*model.UserDomain).Password = user.GetPassword() // Considere recriptar se necessário
-	existingUser.(*model.UserDomain).Age = user.GetAge()
-	existingUser.(*model.UserDomain).UpdatedAt = time.Now().Format(time.RFC3339)
+	userDomain.FirstName = user.GetFirstName()
+	userDomain.LastName = user.GetLastName()
+	userDomain.Email = user.GetEmail()
+	userDomain.Password = user.GetPassword() // Considere recriptar se necessário
+	userDomain.Age = user.GetAge()
+	userDomain.UpdatedAt = time.Now().Format(time.RFC3339)
 
 	// Salvar as alterações no repositório
-	updatedUser, updateErr := s.userRepository.UpdateUser(existingUser.(*model.UserDomain))
+	updatedUser, updateErr := s.userRepository.UpdateUser(userDomain)
 	if updateErr != nil {
 		logger.Error("Erro ao atualizar usuário no banco de dados", zap.Error(updateErr))
 		return nil, updateErr
