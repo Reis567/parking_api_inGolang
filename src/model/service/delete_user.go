@@ -1,30 +1,31 @@
-package repository
+package service
 
 import (
-	"log"
+	"meu-novo-projeto/src/configuration/logger"
 	"meu-novo-projeto/src/configuration/rest_err"
-	"meu-novo-projeto/src/model"
-	"gorm.io/gorm"
+	"strconv" 
+	"go.uber.org/zap"
+
 )
 
-func (r *userRepository) DeleteUser(id uint) *rest_err.RestErr {
-	// Buscar o usuário para garantir que ele existe antes de tentar excluir
-	var user model.UserDomain
-	if err := r.db.First(&user, id).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			log.Printf("Usuário não encontrado para exclusão: ID %d", id)
-			return rest_err.NewNotFoundError("Usuário não encontrado para exclusão")
-		}
-		log.Printf("Erro ao buscar usuário para exclusão: %v", err)
-		return rest_err.NewInternalServerError("Erro ao buscar usuário para exclusão", err)
+
+func (s *userDomainService) DeleteUser(id string) *rest_err.RestErr {
+	logger.Info("Init DeleteUser service", zap.String("journey", "Delete user"))
+
+	// Converte o ID para uint
+	idUint, err := strconv.Atoi(id)
+	if err != nil {
+		logger.Error("ID inválido para exclusão", zap.String("user_id", id), zap.Error(err))
+		return rest_err.NewBadRequestError("ID inválido. Deve ser um número inteiro.")
 	}
 
-	// Excluir o usuário
-	if err := r.db.Delete(&user).Error; err != nil {
-		log.Printf("Erro ao excluir usuário do banco de dados: %v", err)
-		return rest_err.NewInternalServerError("Erro ao excluir usuário", err)
+	// Chama o repositório para excluir o usuário
+	deleteErr := s.userRepository.DeleteUser(uint(idUint))
+	if deleteErr != nil {
+		logger.Error("Erro ao excluir usuário no repositório", zap.Error(deleteErr))
+		return deleteErr
 	}
 
-	log.Printf("Usuário excluído com sucesso: ID %d", id)
+	logger.Info("Usuário excluído com sucesso", zap.String("user_id", id))
 	return nil
 }
