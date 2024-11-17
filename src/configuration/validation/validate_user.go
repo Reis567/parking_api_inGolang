@@ -10,6 +10,7 @@ import (
 	ut "github.com/go-playground/universal-translator"
 	"github.com/go-playground/validator/v10"
 	en_translation "github.com/go-playground/validator/v10/translations/en"
+	"regexp"
 )
 
 var (
@@ -18,14 +19,48 @@ var (
 )
 
 
-func init () {
-	if val,ok :=binding.Validator.Engine().(*validator.Validate); ok {
-		en := en.New()
-		unt := ut.New(en,en)
-		transl,_ = unt.GetTranslator("en")
-		en_translation.RegisterDefaultTranslations(val,transl)
-	}
+func validatePassword(fl validator.FieldLevel) bool {
+    password := fl.Field().String()
+
+    // Verificar se a senha tem pelo menos 8 caracteres
+    if len(password) < 8 {
+        return false
+    }
+
+    // Verificar se contém pelo menos uma letra maiúscula
+    if !regexp.MustCompile(`[A-Z]`).MatchString(password) {
+        return false
+    }
+
+    // Verificar se contém pelo menos um número
+    if !regexp.MustCompile(`\d`).MatchString(password) {
+        return false
+    }
+
+    // Verificar se contém pelo menos um caractere especial
+    if !regexp.MustCompile(`[@$!%*?&]`).MatchString(password) {
+        return false
+    }
+
+    return true
 }
+
+
+func init() {
+    if val, ok := binding.Validator.Engine().(*validator.Validate); ok {
+        validate = val
+
+        // Configurar tradução para inglês
+        en := en.New()
+        unt := ut.New(en, en)
+        transl, _ = unt.GetTranslator("en")
+        en_translation.RegisterDefaultTranslations(validate, transl)
+
+        // Registrar validação personalizada para o campo Password
+        validate.RegisterValidation("password", validatePassword)
+    }
+}
+
 
 func ValidateUserError(
 	validation_err error,
