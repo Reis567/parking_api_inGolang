@@ -19,6 +19,11 @@ func (s *userDomainService) CreateUserService(user model.UserDomainInterface) (m
 	// Encriptar a senha
 	user.(*model.UserDomain).EncryptPassword()
 
+	userComEmail, _ := s.FindUserByEmailService(user.GetEmail())
+	if userComEmail!=nil{
+		return nil ,rest_err.NewBadRequestError("Email ja registrado no sistema")
+	}
+
 	// Salvar o usuário no repositório
 	userDomainRepository, err := s.userRepository.CreateUser(user)
 	if err != nil {
