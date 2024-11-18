@@ -25,7 +25,7 @@ func (uc *userControllerInterface) DeleteUser(c *gin.Context) {
 	}
 
 	// Chama o serviço para excluir o usuário
-	deleteErr := uc.service.DeleteUser(userID)
+	deleteErr := uc.service.DeleteUserService(userID)
 	if deleteErr != nil {
 		logger.Error("Erro ao excluir usuário no serviço", zap.Error(deleteErr))
 		c.JSON(deleteErr.Code, gin.H{

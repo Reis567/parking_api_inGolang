@@ -9,7 +9,7 @@ import (
 )
 
 
-func (s *userDomainService) DeleteUser(id string) *rest_err.RestErr {
+func (s *userDomainService) DeleteUserService(id string) *rest_err.RestErr {
 	logger.Info("Init DeleteUser service", zap.String("journey", "Delete user"))
 
 	// Converte o ID para uint
