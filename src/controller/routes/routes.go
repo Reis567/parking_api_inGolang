@@ -13,5 +13,6 @@ func InitRoutes(r *gin.RouterGroup, userController user.UserControllerInterface)
 		userRoutes.GET("/email/:email", userController.FindUserByEmail)
 		userRoutes.PUT("/:id", userController.UpdateUser)
 		userRoutes.DELETE("/:id", userController.DeleteUser)
+		userRoutes.POST("/login", userController.DeleteUser)
 	}
 }
