@@ -21,6 +21,7 @@ type UserDomainInterface interface {
 	GetUpdatedAt() string
 	GetJSONValue() (string, error)
 	SetID(id uint)
+	CheckPassword(password string) bool
 }
 
 func NewUserDomain(firstName, lastName, email, password string, age int8) UserDomainInterface {
@@ -93,6 +94,12 @@ func (ud *UserDomain) EncryptPassword() {
 	hash.Write([]byte(ud.Password))
 	ud.Password = hex.EncodeToString(hash.Sum(nil))
 }
+func (ud *UserDomain) CheckPassword(password string) bool {
+	hash := md5.New() // Use o mesmo método de criptografia usado ao criar a senha
+	hash.Write([]byte(password))
+	return hex.EncodeToString(hash.Sum(nil)) == ud.Password
+}
+
 
 func (ud *UserDomain) GetJSONValue() (string, error) {
 	jsonData, err := json.Marshal(ud)
