@@ -38,6 +38,15 @@ func NewUserDomain(firstName, lastName, email, password string, age int8) UserDo
 	return user
 }
 
+func NewUserLoginDomain(email, password string) UserDomainInterface {
+	user := &UserDomain{
+		Email:     email,
+		Password:  password,
+	}
+
+	return user
+}
+
 // UserDomain representa a estrutura de um usuário no sistema
 type UserDomain struct {
 	ID        uint           `gorm:"primaryKey" json:"id"`
