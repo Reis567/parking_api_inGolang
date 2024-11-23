@@ -1,9 +1,9 @@
 package user
 
-
 import (
 	"meu-novo-projeto/src/configuration/logger"
 	"meu-novo-projeto/src/controller/model/request"
+	"meu-novo-projeto/src/model"
 	"meu-novo-projeto/src/configuration/jwt"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -22,8 +22,11 @@ func (uc *userControllerInterface) LoginUser(c *gin.Context) {
 
 	logger.Info("Dados decodificados para UserLogin", zap.Any("loginRequest", loginRequest))
 
+	// Criar instância do domínio para o login
+	userDomain := model.NewUserLoginDomain(loginRequest.Email, loginRequest.Password)
+
 	// Validar email e senha
-	user, err := uc.service.LoginUserService(loginRequest.Email, loginRequest.Password)
+	user, err := uc.service.LoginUserService(userDomain)
 	if err != nil {
 		logger.Error("Erro ao autenticar usuário", zap.Error(err))
 		c.JSON(err.Code, gin.H{"message": err.Message})
