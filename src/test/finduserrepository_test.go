@@ -1,4 +1,5 @@
-package test
+package repository_test
+
 
 import "testing"
 
