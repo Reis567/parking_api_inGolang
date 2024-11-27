@@ -2,22 +2,12 @@ package repository
 
 import (
 	"log"
-	"meu-novo-projeto/src/configuration/database"
+
 	"meu-novo-projeto/src/configuration/rest_err"
 	"meu-novo-projeto/src/model"
 
-	"gorm.io/gorm"
+
 )
-
-// userRepository é uma estrutura que implementa a interface UserRepository
-type userRepository struct {
-	db *gorm.DB
-}
-
-// NewUserRepository cria uma nova instância de userRepository
-func NewUserRepository() UserRepository {
-	return &userRepository{db: database.DB} // Usa a conexão existente em database.DB
-}
 
 // CreateUser insere um novo usuário no banco de dados
 func (r *userRepository) CreateUser(user model.UserDomainInterface) (model.UserDomainInterface, *rest_err.RestErr) {

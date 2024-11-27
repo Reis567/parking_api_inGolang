@@ -1,7 +1,6 @@
 package repository_test
 
 import (
-	"meu-novo-projeto/src/configuration/rest_err"
 	"meu-novo-projeto/src/model/repository"
 	"meu-novo-projeto/src/model"
 	"testing"
