@@ -3,7 +3,7 @@ package service_test
 import (
 	"meu-novo-projeto/src/configuration/rest_err"
 	"meu-novo-projeto/src/model"
-	"meu-novo-projeto/src/service"
+	"meu-novo-projeto/src/model/service"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -13,6 +13,14 @@ import (
 // Mock do UserRepository
 type mockUserRepository struct {
 	mock.Mock
+}
+
+func (m *mockUserRepository) CreateUser(user model.UserDomainInterface) (model.UserDomainInterface, *rest_err.RestErr) {
+	args := m.Called(user)
+	if args.Get(0) != nil {
+		return args.Get(0).(model.UserDomainInterface), nil
+	}
+	return nil, args.Get(1).(*rest_err.RestErr)
 }
 
 func (m *mockUserRepository) FindUserByID(id uint) (model.UserDomainInterface, *rest_err.RestErr) {
@@ -31,10 +39,27 @@ func (m *mockUserRepository) FindUserByEmail(email string) (model.UserDomainInte
 	return nil, args.Get(1).(*rest_err.RestErr)
 }
 
+func (m *mockUserRepository) UpdateUser(user *model.UserDomain) (*model.UserDomain, *rest_err.RestErr) {
+	args := m.Called(user)
+	if args.Get(0) != nil {
+		return args.Get(0).(*model.UserDomain), nil
+	}
+	return nil, args.Get(1).(*rest_err.RestErr)
+}
+
+func (m *mockUserRepository) DeleteUser(id uint) *rest_err.RestErr {
+	args := m.Called(id)
+	if args.Get(0) != nil {
+		return args.Get(0).(*rest_err.RestErr)
+	}
+	return nil
+}
+
+// Teste para FindUserByIDService
 func TestFindUserByIDService(t *testing.T) {
 	// Configurar mock do repositório
 	mockRepo := new(mockUserRepository)
-	service := service.NewUserDomainService(mockRepo)
+	userService := service.NewUserDomainService(mockRepo)
 
 	// Usuário de teste
 	testUser := &model.UserDomain{
@@ -46,37 +71,32 @@ func TestFindUserByIDService(t *testing.T) {
 		Age:       30,
 	}
 
-	// Configurar mock para sucesso
+	// Cenário de sucesso
 	mockRepo.On("FindUserByID", uint(1)).Return(testUser, nil)
+	user, err := userService.FindUserByIDService(1)
 
-	// Chamar o serviço
-	user, err := service.FindUserByIDService(1)
-
-	// Verificações
-	assert.Nil(t, err, "Erro deve ser nulo")
-	assert.NotNil(t, user, "Usuário retornado não deve ser nulo")
-	assert.Equal(t, testUser.FirstName, user.GetFirstName(), "Primeiro nome deve ser igual")
-	assert.Equal(t, testUser.LastName, user.GetLastName(), "Último nome deve ser igual")
-	assert.Equal(t, testUser.Email, user.GetEmail(), "Email deve ser igual")
+	assert.Nil(t, err)
+	assert.NotNil(t, user)
+	assert.Equal(t, "John", user.GetFirstName())
+	assert.Equal(t, "Doe", user.GetLastName())
+	assert.Equal(t, "john.doe@example.com", user.GetEmail())
 	mockRepo.AssertExpectations(t)
 
-	// Configurar mock para falha
+	// Cenário de falha
 	mockRepo.On("FindUserByID", uint(999)).Return(nil, rest_err.NewNotFoundError("Usuário não encontrado"))
+	user, err = userService.FindUserByIDService(999)
 
-	// Chamar o serviço com ID inexistente
-	user, err = service.FindUserByIDService(999)
-
-	// Verificações
-	assert.NotNil(t, err, "Erro deve ser retornado")
-	assert.Nil(t, user, "Usuário deve ser nulo")
-	assert.Equal(t, "Usuário não encontrado", err.Message, "Mensagem de erro deve ser 'Usuário não encontrado'")
+	assert.NotNil(t, err)
+	assert.Nil(t, user)
+	assert.Equal(t, "Usuário não encontrado", err.Message)
 	mockRepo.AssertExpectations(t)
 }
 
+// Teste para FindUserByEmailService
 func TestFindUserByEmailService(t *testing.T) {
 	// Configurar mock do repositório
 	mockRepo := new(mockUserRepository)
-	service := service.NewUserDomainService(mockRepo)
+	userService := service.NewUserDomainService(mockRepo)
 
 	// Usuário de teste
 	testUser := &model.UserDomain{
@@ -88,29 +108,23 @@ func TestFindUserByEmailService(t *testing.T) {
 		Age:       25,
 	}
 
-	// Configurar mock para sucesso
+	// Cenário de sucesso
 	mockRepo.On("FindUserByEmail", "jane.smith@example.com").Return(testUser, nil)
+	user, err := userService.FindUserByEmailService("jane.smith@example.com")
 
-	// Chamar o serviço
-	user, err := service.FindUserByEmailService("jane.smith@example.com")
-
-	// Verificações
-	assert.Nil(t, err, "Erro deve ser nulo")
-	assert.NotNil(t, user, "Usuário retornado não deve ser nulo")
-	assert.Equal(t, testUser.FirstName, user.GetFirstName(), "Primeiro nome deve ser igual")
-	assert.Equal(t, testUser.LastName, user.GetLastName(), "Último nome deve ser igual")
-	assert.Equal(t, testUser.Email, user.GetEmail(), "Email deve ser igual")
+	assert.Nil(t, err)
+	assert.NotNil(t, user)
+	assert.Equal(t, "Jane", user.GetFirstName())
+	assert.Equal(t, "Smith", user.GetLastName())
+	assert.Equal(t, "jane.smith@example.com", user.GetEmail())
 	mockRepo.AssertExpectations(t)
 
-	// Configurar mock para falha
+	// Cenário de falha
 	mockRepo.On("FindUserByEmail", "ghost@example.com").Return(nil, rest_err.NewNotFoundError("Usuário não encontrado"))
+	user, err = userService.FindUserByEmailService("ghost@example.com")
 
-	// Chamar o serviço com email inexistente
-	user, err = service.FindUserByEmailService("ghost@example.com")
-
-	// Verificações
-	assert.NotNil(t, err, "Erro deve ser retornado")
-	assert.Nil(t, user, "Usuário deve ser nulo")
-	assert.Equal(t, "Usuário não encontrado", err.Message, "Mensagem de erro deve ser 'Usuário não encontrado'")
+	assert.NotNil(t, err)
+	assert.Nil(t, user)
+	assert.Equal(t, "Usuário não encontrado", err.Message)
 	mockRepo.AssertExpectations(t)
 }
