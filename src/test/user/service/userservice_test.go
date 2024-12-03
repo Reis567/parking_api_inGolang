@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+	"time"
 )
 
 // Mock do UserRepository
@@ -126,5 +127,63 @@ func TestFindUserByEmailService(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Nil(t, user)
 	assert.Equal(t, "Usuário não encontrado", err.Message)
+	mockRepo.AssertExpectations(t)
+}
+
+
+func TestCreateUserService(t *testing.T) {
+	// Configurar mock do repositório
+	mockRepo := new(mockUserRepository)
+	userService := service.NewUserDomainService(mockRepo)
+
+	// Usuário de teste
+	testUser := &model.UserDomain{
+		FirstName: "John",
+		LastName:  "Doe",
+		Email:     "john.doe@example.com",
+		Password:  "password123",
+		Age:       30,
+	}
+
+	// Cenário de sucesso
+	mockRepo.On("CreateUser", mock.Anything).Return(func(user model.UserDomainInterface) model.UserDomainInterface {
+		user.(*model.UserDomain).ID = 1
+		user.(*model.UserDomain).CreatedAt = time.Now().Format(time.RFC3339)
+		user.(*model.UserDomain).UpdatedAt = time.Now().Format(time.RFC3339)
+		return user
+	}, nil)
+	mockRepo.On("FindUserByEmail", "john.doe@example.com").Return(nil, nil)
+
+	// Chamar o serviço
+	createdUser, err := userService.CreateUserService(testUser)
+
+	// Verificações
+	assert.Nil(t, err, "Erro deve ser nulo")
+	assert.NotNil(t, createdUser, "Usuário criado não deve ser nulo")
+	assert.Equal(t, "John", createdUser.GetFirstName(), "Primeiro nome deve ser igual")
+	assert.Equal(t, "Doe", createdUser.GetLastName(), "Último nome deve ser igual")
+	assert.Equal(t, "john.doe@example.com", createdUser.GetEmail(), "Email deve ser igual")
+	mockRepo.AssertExpectations(t)
+
+	// Cenário de falha - Email já registrado
+	mockRepo.On("FindUserByEmail", "john.doe@example.com").Return(testUser, nil)
+
+	createdUser, err = userService.CreateUserService(testUser)
+
+	assert.NotNil(t, err, "Erro deve ser retornado")
+	assert.Nil(t, createdUser, "Usuário não deve ser criado")
+	assert.Equal(t, "Email ja registrado no sistema", err.Message, "Mensagem de erro deve ser 'Email ja registrado no sistema'")
+	mockRepo.AssertExpectations(t)
+
+	// Cenário de falha - Erro ao salvar no repositório
+	mockRepo.On("FindUserByEmail", "unique@example.com").Return(nil, nil)
+	mockRepo.On("CreateUser", mock.Anything).Return(nil, rest_err.NewInternalServerError("Erro ao criar usuário", nil))
+
+	testUser.Email = "unique@example.com"
+	createdUser, err = userService.CreateUserService(testUser)
+
+	assert.NotNil(t, err, "Erro deve ser retornado")
+	assert.Nil(t, createdUser, "Usuário não deve ser criado")
+	assert.Equal(t, "Erro ao criar usuário", err.Message, "Mensagem de erro deve ser 'Erro ao criar usuário'")
 	mockRepo.AssertExpectations(t)
 }
