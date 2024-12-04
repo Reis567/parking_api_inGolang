@@ -187,3 +187,57 @@ func TestCreateUserService(t *testing.T) {
 	assert.Equal(t, "Erro ao criar usuário", err.Message, "Mensagem de erro deve ser 'Erro ao criar usuário'")
 	mockRepo.AssertExpectations(t)
 }
+
+
+
+func TestUpdateUserService(t *testing.T) {
+	// Configurar mock do repositório
+	mockRepo := new(mockUserRepository)
+	userService := service.NewUserDomainService(mockRepo)
+
+	// Usuário existente
+	existingUser := &model.UserDomain{
+		ID:        1,
+		FirstName: "John",
+		LastName:  "Doe",
+		Email:     "john.doe@example.com",
+		Password:  "password123",
+		Age:       30,
+		UpdatedAt: time.Now().Format(time.RFC3339),
+	}
+
+	// Novo usuário com alterações
+	updatedUser := &model.UserDomain{
+		ID:        1,
+		FirstName: "John",
+		LastName:  "Smith",
+		Email:     "john.smith@example.com",
+		Password:  "newpassword123",
+		Age:       35,
+	}
+
+	// Cenário de sucesso
+	mockRepo.On("FindUserByID", uint(1)).Return(existingUser, nil)
+	mockRepo.On("UpdateUser", mock.Anything).Return(updatedUser, nil)
+
+	// Chamar o serviço
+	result, err := userService.UpdateUserService(updatedUser)
+
+	// Verificações
+	assert.Nil(t, err, "Erro deve ser nulo")
+	assert.NotNil(t, result, "Usuário atualizado não deve ser nulo")
+	assert.Equal(t, updatedUser.FirstName, result.GetFirstName(), "Primeiro nome deve ser atualizado")
+	assert.Equal(t, updatedUser.LastName, result.GetLastName(), "Último nome deve ser atualizado")
+	assert.Equal(t, updatedUser.Email, result.GetEmail(), "Email deve ser atualizado")
+	mockRepo.AssertExpectations(t)
+
+	// Cenário de falha - Usuário não encontrado
+	mockRepo.On("FindUserByID", uint(2)).Return(nil, rest_err.NewNotFoundError("Usuário não encontrado"))
+
+	result, err = userService.UpdateUserService(&model.UserDomain{ID: 2})
+
+	assert.NotNil(t, err, "Erro deve ser retornado")
+	assert.Nil(t, result, "Usuário não deve ser atualizado")
+	assert.Equal(t, "Usuário não encontrado", err.Message, "Mensagem de erro deve ser 'Usuário não encontrado'")
+	mockRepo.AssertExpectations(t)
+}
