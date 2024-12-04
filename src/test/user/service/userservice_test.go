@@ -241,3 +241,34 @@ func TestUpdateUserService(t *testing.T) {
 	assert.Equal(t, "Usuário não encontrado", err.Message, "Mensagem de erro deve ser 'Usuário não encontrado'")
 	mockRepo.AssertExpectations(t)
 }
+
+
+func TestDeleteUserService(t *testing.T) {
+	// Configurar mock do repositório
+	mockRepo := new(mockUserRepository)
+	userService := service.NewUserDomainService(mockRepo)
+
+	// Cenário de sucesso
+	mockRepo.On("DeleteUser", uint(1)).Return(nil)
+
+	err := userService.DeleteUserService("1")
+
+	// Verificações
+	assert.Nil(t, err, "Erro deve ser nulo")
+	mockRepo.AssertExpectations(t)
+
+	// Cenário de falha - ID inválido
+	err = userService.DeleteUserService("abc")
+
+	assert.NotNil(t, err, "Erro deve ser retornado")
+	assert.Equal(t, "ID inválido. Deve ser um número inteiro.", err.Message, "Mensagem de erro deve ser 'ID inválido. Deve ser um número inteiro.'")
+
+	// Cenário de falha - Usuário não encontrado
+	mockRepo.On("DeleteUser", uint(999)).Return(rest_err.NewNotFoundError("Usuário não encontrado"))
+
+	err = userService.DeleteUserService("999")
+
+	assert.NotNil(t, err, "Erro deve ser retornado")
+	assert.Equal(t, "Usuário não encontrado", err.Message, "Mensagem de erro deve ser 'Usuário não encontrado'")
+	mockRepo.AssertExpectations(t)
+}
