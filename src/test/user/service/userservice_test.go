@@ -272,3 +272,61 @@ func TestDeleteUserService(t *testing.T) {
 	assert.Equal(t, "Usuário não encontrado", err.Message, "Mensagem de erro deve ser 'Usuário não encontrado'")
 	mockRepo.AssertExpectations(t)
 }
+
+
+func TestLoginUserService(t *testing.T) {
+	// Configurar mock do repositório
+	mockRepo := new(mockUserRepository)
+	userService := service.NewUserDomainService(mockRepo)
+
+	// Usuário armazenado no banco
+	storedUser := &model.UserDomain{
+		ID:        1,
+		FirstName: "John",
+		LastName:  "Doe",
+		Email:     "john.doe@example.com",
+		Password:  "password123",
+		Age:       30,
+	}
+	// Simular a senha encriptada no banco
+	storedUser.EncryptPassword()
+
+	// Usuário de teste para login
+	loginUser := &model.UserDomain{
+		Email:    "john.doe@example.com",
+		Password: "password123",
+	}
+
+	// Cenário de sucesso - Email e senha corretos
+	mockRepo.On("FindUserByEmail", "john.doe@example.com").Return(storedUser, nil)
+
+	// Chamar o serviço
+	loggedInUser, err := userService.LoginUserService(loginUser)
+
+	// Verificações
+	assert.Nil(t, err, "Erro deve ser nulo")
+	assert.NotNil(t, loggedInUser, "Usuário retornado não deve ser nulo")
+	assert.Equal(t, storedUser.GetID(), loggedInUser.GetID(), "IDs dos usuários devem ser iguais")
+	assert.Equal(t, storedUser.GetEmail(), loggedInUser.GetEmail(), "Emails dos usuários devem ser iguais")
+	mockRepo.AssertExpectations(t)
+
+	// Cenário de falha - Email não encontrado
+	mockRepo.On("FindUserByEmail", "invalid@example.com").Return(nil, rest_err.NewUnauthorizedError("Credenciais inválidas"))
+
+	loggedInUser, err = userService.LoginUserService(&model.UserDomain{Email: "invalid@example.com", Password: "password123"})
+
+	assert.NotNil(t, err, "Erro deve ser retornado")
+	assert.Nil(t, loggedInUser, "Usuário deve ser nulo")
+	assert.Equal(t, "Credenciais inválidas", err.Message, "Mensagem de erro deve ser 'Credenciais inválidas'")
+	mockRepo.AssertExpectations(t)
+
+	// Cenário de falha - Senha incorreta
+	mockRepo.On("FindUserByEmail", "john.doe@example.com").Return(storedUser, nil)
+
+	loggedInUser, err = userService.LoginUserService(&model.UserDomain{Email: "john.doe@example.com", Password: "wrongpassword"})
+
+	assert.NotNil(t, err, "Erro deve ser retornado")
+	assert.Nil(t, loggedInUser, "Usuário deve ser nulo")
+	assert.Equal(t, "Credenciais inválidas", err.Message, "Mensagem de erro deve ser 'Credenciais inválidas'")
+	mockRepo.AssertExpectations(t)
+}
