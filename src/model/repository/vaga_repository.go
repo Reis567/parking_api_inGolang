@@ -25,6 +25,7 @@ func NewVagaRepositoryWithDB(customDB *gorm.DB) VagaRepository {
 type VagaRepository interface {
 	CreateVaga(vaga model.VagaDomainInterface) (model.VagaDomainInterface, *rest_err.RestErr)
 	FindVagaByID(id uint) (model.VagaDomainInterface, *rest_err.RestErr)
+	FindAllVagas() ([]model.VagaDomainInterface, *rest_err.RestErr)
 	UpdateVaga(vaga *model.VagaDomain) (*model.VagaDomain, *rest_err.RestErr)
 	DeleteVaga(id uint) *rest_err.RestErr
 }
