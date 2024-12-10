@@ -21,3 +21,16 @@ func (s *vagaDomainService) FindVagaByIDService(id uint) (model.VagaDomainInterf
 	return vaga, nil
 }
 
+// FindAllVagasService busca todas as vagas
+func (s *vagaDomainService) FindAllVagasService() ([]model.VagaDomainInterface, *rest_err.RestErr) {
+	logger.Info("Init FindAllVagasService")
+
+	vagas, err := s.vagaRepository.FindAllVagas()
+	if err != nil {
+		logger.Error("Erro ao buscar todas as vagas no repositório", zap.Error(err))
+		return nil, err
+	}
+
+	logger.Info("Vagas encontradas com sucesso", zap.Int("total", len(vagas)))
+	return vagas, nil
+}
