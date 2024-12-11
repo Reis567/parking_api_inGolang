@@ -23,3 +23,13 @@ func (vc *vagaControllerInterface) FindVagaByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"vaga": vaga})
 }
 
+// FindAllVagas busca todas as vagas
+func (vc *vagaControllerInterface) FindAllVagas(c *gin.Context) {
+	vagas, errRes := vc.service.FindAllVagasService()
+	if errRes != nil {
+		c.JSON(errRes.Code, gin.H{"message": errRes.Message})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"vagas": vagas})
+}
