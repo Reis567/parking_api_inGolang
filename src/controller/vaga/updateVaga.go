@@ -4,6 +4,7 @@ import (
 	"meu-novo-projeto/src/model"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"strconv"
 )
 
 func (vc *vagaControllerInterface) UpdateVaga(c *gin.Context) {
