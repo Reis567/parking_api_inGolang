@@ -26,5 +26,9 @@ func InitRoutes(r *gin.RouterGroup, userController user.UserControllerInterface,
 
 	// Rotas de vaga
 	vagaRoutes := r.Group("/vagas")
+	{
+		// Aplica o middleware AuthMiddleware às rotas protegidas de vagas
+		vagaRoutes.Use(middleware.AuthMiddleware())
 
+	}
 }
