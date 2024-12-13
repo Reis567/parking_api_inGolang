@@ -29,6 +29,12 @@ func InitRoutes(r *gin.RouterGroup, userController user.UserControllerInterface,
 	{
 		// Aplica o middleware AuthMiddleware às rotas protegidas de vagas
 		vagaRoutes.Use(middleware.AuthMiddleware())
-
+		{
+			vagaRoutes.POST("/", vagaController.CreateVaga)
+			vagaRoutes.GET("/:id", vagaController.FindVagaByID)
+			vagaRoutes.GET("/", vagaController.FindAllVagas)
+			vagaRoutes.PUT("/:id", vagaController.UpdateVaga)
+			vagaRoutes.DELETE("/:id", vagaController.DeleteVaga)
+		}
 	}
 }
