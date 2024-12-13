@@ -9,6 +9,7 @@ import (
 	"meu-novo-projeto/src/configuration/logger"
 	"meu-novo-projeto/src/controller/routes"
 	"meu-novo-projeto/src/controller/user"
+	"meu-novo-projeto/src/controller/vaga" // Certifique-se de usar o pacote correto
 	"meu-novo-projeto/src/middleware"
 	"meu-novo-projeto/src/model/repository"
 	"meu-novo-projeto/src/model/service"
@@ -44,16 +45,20 @@ func main() {
 	userService := service.NewUserDomainService(repo)
 	userController := user.NewUserControllerInterface(userService)
 
+	repoVaga := repository.NewVagaRepository()
+	vagaService := service.NewVagaDomainService(repoVaga)
+	vagaController := vaga.NewVagaControllerInterface(vagaService)
+
 	// Configurar o servidor Gin
 	router := gin.Default()
-    router.SetTrustedProxies([]string{"127.0.0.1"})
+	router.SetTrustedProxies([]string{"127.0.0.1"})
 
 	// Aplicar middleware de erros
 	router.Use(middleware.ErrorHandlingMiddleware())
 
 	// Inicializar rotas com as dependências
 	api := router.Group("/api/v1")
-	routes.InitRoutes(api, userController)
+	routes.InitRoutes(api, userController, vagaController)
 
 	// Rodar a aplicação e tratar erro de inicialização
 	if err := router.Run(fmt.Sprintf(":%s", appPort)); err != nil {
