@@ -2,11 +2,13 @@ package routes
 
 import (
 	"meu-novo-projeto/src/controller/user"
+	"meu-novo-projeto/src/controller/vaga"
 	"meu-novo-projeto/src/middleware"
 	"github.com/gin-gonic/gin"
 )
 
-func InitRoutes(r *gin.RouterGroup, userController user.UserControllerInterface) {
+func InitRoutes(r *gin.RouterGroup, userController user.UserControllerInterface, vagaController vaga.VagaControllerInterface) {
+	// Rotas de usuário
 	userRoutes := r.Group("/users")
 	{
 		userRoutes.POST("/", userController.CreateUser)
@@ -21,4 +23,8 @@ func InitRoutes(r *gin.RouterGroup, userController user.UserControllerInterface)
 			userRoutes.DELETE("/:id", userController.DeleteUser)
 		}
 	}
+
+	// Rotas de vaga
+	vagaRoutes := r.Group("/vagas")
+
 }
