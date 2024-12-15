@@ -22,3 +22,19 @@ func (r *veiculoRepository) FindVeiculoByID(id uint) (model.VehicleDomainInterfa
 	return &veiculo, nil
 }
 
+// FindAllVeiculos busca todos os veículos
+func (r *veiculoRepository) FindAllVeiculos() ([]model.VehicleDomainInterface, *rest_err.RestErr) {
+	var veiculos []model.VehicleDomain
+	if err := r.db.Find(&veiculos).Error; err != nil {
+		log.Printf("Erro ao buscar veículos no banco de dados: %v", err)
+		return nil, rest_err.NewInternalServerError("Erro ao buscar veículos", err)
+	}
+
+	// Converte para interfaces
+	veiculoInterfaces := make([]model.VehicleDomainInterface, len(veiculos))
+	for i, v := range veiculos {
+		veiculoInterfaces[i] = &v
+	}
+
+	return veiculoInterfaces, nil
+}
