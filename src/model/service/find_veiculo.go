@@ -21,3 +21,16 @@ func (s *vehicleDomainService) FindVehicleByIDService(id uint) (model.VehicleDom
 	return vehicle, nil
 }
 
+// FindAllVehiclesService busca todos os veículos
+func (s *vehicleDomainService) FindAllVehiclesService() ([]model.VehicleDomainInterface, *rest_err.RestErr) {
+	logger.Info("Init FindAllVehicles service")
+
+	vehicles, err := s.vehicleRepository.FindAllVeiculos()
+	if err != nil {
+		logger.Error("Erro ao buscar todos os veículos no repositório", zap.Error(err))
+		return nil, err
+	}
+
+	logger.Info("Todos os veículos encontrados com sucesso", zap.Int("total", len(vehicles)))
+	return vehicles, nil
+}
