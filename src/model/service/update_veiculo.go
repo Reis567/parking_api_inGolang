@@ -8,24 +8,25 @@ import (
 	"time"
 )
 
-// UpdateVehicleService atualiza um veículo
+// UpdateVehicleService atualiza os dados de um veículo
 func (s *vehicleDomainService) UpdateVehicleService(vehicle model.VehicleDomainInterface) (model.VehicleDomainInterface, *rest_err.RestErr) {
-	logger.Info("Init UpdateVehicle service", zap.Uint("vehicle_id", vehicle.GetID()))
+	logger.Info("Init UpdateVehicleService", zap.Uint("vehicle_id", vehicle.GetID()))
 
-	// Buscar o veículo existente
+	// Buscar veículo existente no repositório
 	existingVehicle, err := s.vehicleRepository.FindVeiculoByID(vehicle.GetID())
 	if err != nil {
-		logger.Error("Erro ao buscar veículo no repositório", zap.Error(err))
+		logger.Error("Erro ao buscar veículo para atualização", zap.Error(err))
 		return nil, err
 	}
 
-	// Atualizar campos
-	existingVehicle.(*model.VehicleDomain).Plate = vehicle.GetPlate()
-	existingVehicle.(*model.VehicleDomain).Type = vehicle.GetType()
-	existingVehicle.(*model.VehicleDomain).Owner = vehicle.GetOwner()
+	// Atualizar os campos necessários no veículo existente
+	existingVehicle.(*model.VehicleDomain).Placa = vehicle.GetPlaca()
+	existingVehicle.(*model.VehicleDomain).Modelo = vehicle.GetModelo()
+	existingVehicle.(*model.VehicleDomain).Cor = vehicle.GetCor()
+	existingVehicle.(*model.VehicleDomain).Status = vehicle.GetStatus()
 	existingVehicle.(*model.VehicleDomain).UpdatedAt = time.Now().Format(time.RFC3339)
 
-	// Salvar no repositório
+	// Salvar as alterações no repositório
 	updatedVehicle, updateErr := s.vehicleRepository.UpdateVeiculo(existingVehicle.(*model.VehicleDomain))
 	if updateErr != nil {
 		logger.Error("Erro ao atualizar veículo no repositório", zap.Error(updateErr))
