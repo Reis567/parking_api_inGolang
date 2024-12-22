@@ -23,3 +23,13 @@ func (vc *veiculoControllerInterface) FindVeiculoByID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": veiculo})
 }
+
+func (vc *veiculoControllerInterface) FindAllVeiculos(c *gin.Context) {
+	veiculos, err := vc.service.FindAllVeiculosService()
+	if err != nil {
+		c.JSON(err.Code, gin.H{"error": err.Message})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": veiculos})
+}
