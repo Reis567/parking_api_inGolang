@@ -15,7 +15,7 @@ func (vc *veiculoControllerInterface) FindVeiculoByID(c *gin.Context) {
 		return
 	}
 
-	veiculo, fetchErr := vc.service.FindVeiculoByIDService(uint(id))
+	veiculo, fetchErr := vc.service.FindVehicleByIDService(uint(id))
 	if fetchErr != nil {
 		c.JSON(fetchErr.Code, gin.H{"error": fetchErr.Message})
 		return
@@ -25,7 +25,7 @@ func (vc *veiculoControllerInterface) FindVeiculoByID(c *gin.Context) {
 }
 
 func (vc *veiculoControllerInterface) FindAllVeiculos(c *gin.Context) {
-	veiculos, err := vc.service.FindAllVeiculosService()
+	veiculos, err := vc.service.FindAllVehiclesService()
 	if err != nil {
 		c.JSON(err.Code, gin.H{"error": err.Message})
 		return
