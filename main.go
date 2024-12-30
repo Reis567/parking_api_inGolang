@@ -49,6 +49,10 @@ func main() {
 	vagaService := service.NewVagaDomainService(repoVaga)
 	vagaController := vaga.NewVagaControllerInterface(vagaService)
 
+	veiculoRepo := repository.NewVehicleRepository()
+	veiculoService := service.NewVehicleDomainService(veiculoRepo)
+	veiculoController := veiculo.NewVehicleControllerInterface(veiculoService)
+
 	// Configurar o servidor Gin
 	router := gin.Default()
 	router.SetTrustedProxies([]string{"127.0.0.1"})
@@ -58,7 +62,7 @@ func main() {
 
 	// Inicializar rotas com as dependências
 	api := router.Group("/api/v1")
-	routes.InitRoutes(api, userController, vagaController)
+	routes.InitRoutes(api, userController, vagaController,veiculoController)
 
 	// Rodar a aplicação e tratar erro de inicialização
 	if err := router.Run(fmt.Sprintf(":%s", appPort)); err != nil {
