@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitRoutes(r *gin.RouterGroup, userController user.UserControllerInterface, vagaController vaga.VagaControllerInterface, veiculoController veiculo.VehicleControllerInterface) {
+func InitRoutes(r *gin.RouterGroup, userController user.UserControllerInterface, vagaController vaga.VagaControllerInterface, veiculoController veiculo.VeiculoControllerInterface) {
 	// Rotas de usuário
 	userRoutes := r.Group("/users")
 	{
@@ -45,11 +45,11 @@ func InitRoutes(r *gin.RouterGroup, userController user.UserControllerInterface,
 		// Aplica o middleware AuthMiddleware às rotas protegidas de veículos
 		vehicleRoutes.Use(middleware.AuthMiddleware())
 		{
-			vehicleRoutes.POST("/", veiculoController.CreateVehicle)
-			vehicleRoutes.GET("/:id", veiculoController.FindVehicleByID)
-			vehicleRoutes.GET("/", veiculoController.FindAllVehicles)
-			vehicleRoutes.PUT("/:id", veiculoController.UpdateVehicle)
-			vehicleRoutes.DELETE("/:id", veiculoController.DeleteVehicle)
+			vehicleRoutes.POST("/", veiculoController.CreateVeiculo)
+			vehicleRoutes.GET("/:id", veiculoController.FindVeiculoByID)
+			vehicleRoutes.GET("/", veiculoController.FindAllVeiculos)
+			vehicleRoutes.PUT("/:id", veiculoController.UpdateVeiculo)
+			vehicleRoutes.DELETE("/:id", veiculoController.DeleteVeiculo)
 		}
 	}
 }
