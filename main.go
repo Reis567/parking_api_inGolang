@@ -9,7 +9,8 @@ import (
 	"meu-novo-projeto/src/configuration/logger"
 	"meu-novo-projeto/src/controller/routes"
 	"meu-novo-projeto/src/controller/user"
-	"meu-novo-projeto/src/controller/vaga" // Certifique-se de usar o pacote correto
+	"meu-novo-projeto/src/controller/vaga"
+	"meu-novo-projeto/src/controller/veiculo" // Import para o controlador de veículos
 	"meu-novo-projeto/src/middleware"
 	"meu-novo-projeto/src/model/repository"
 	"meu-novo-projeto/src/model/service"
@@ -41,17 +42,18 @@ func main() {
 		log.Fatal("A porta da aplicação (APP_PORT) não está definida no arquivo .env")
 	}
 
-	repo := repository.NewUserRepository()
-	userService := service.NewUserDomainService(repo)
+	// Inicializar repositórios e serviços
+	userRepo := repository.NewUserRepository()
+	userService := service.NewUserDomainService(userRepo)
 	userController := user.NewUserControllerInterface(userService)
 
-	repoVaga := repository.NewVagaRepository()
-	vagaService := service.NewVagaDomainService(repoVaga)
+	vagaRepo := repository.NewVagaRepository()
+	vagaService := service.NewVagaDomainService(vagaRepo)
 	vagaController := vaga.NewVagaControllerInterface(vagaService)
 
-	veiculoRepo := repository.NewVehicleRepository()
+	veiculoRepo := repository.NewVeiculoRepository()
 	veiculoService := service.NewVehicleDomainService(veiculoRepo)
-	veiculoController := veiculo.NewVehicleControllerInterface(veiculoService)
+	veiculoController := veiculo.NewVeiculoControllerInterface(veiculoService)
 
 	// Configurar o servidor Gin
 	router := gin.Default()
@@ -62,7 +64,7 @@ func main() {
 
 	// Inicializar rotas com as dependências
 	api := router.Group("/api/v1")
-	routes.InitRoutes(api, userController, vagaController,veiculoController)
+	routes.InitRoutes(api, userController, vagaController, veiculoController)
 
 	// Rodar a aplicação e tratar erro de inicialização
 	if err := router.Run(fmt.Sprintf(":%s", appPort)); err != nil {
