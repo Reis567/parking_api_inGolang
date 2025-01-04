@@ -22,3 +22,18 @@ func (r *registroEstacionamentoRepository) FindRegistroByID(id uint) (model.Regi
 	}
 	return &registro, nil
 }
+
+func (r *registroEstacionamentoRepository) FindAllRegistros() ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) {
+	var registros []model.RegistroEstacionamentoDomain
+
+	if err := r.db.Find(&registros).Error; err != nil {
+		log.Printf("Erro ao buscar todos os registros: %v", err)
+		return nil, rest_err.NewInternalServerError("Erro ao buscar registros", err)
+	}
+
+	registrosInterface := make([]model.RegistroEstacionamentoDomainInterface, len(registros))
+	for i, registro := range registros {
+		registrosInterface[i] = &registro
+	}
+	return registrosInterface, nil
+}
