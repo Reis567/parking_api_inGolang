@@ -20,3 +20,15 @@ func (s *registroEstacionamentoDomainService) FindAllRegistrosService() ([]model
 	logger.Info("Registros retornados com sucesso", zap.Int("count", len(registros)))
 	return registros, nil
 }
+func (s *registroEstacionamentoDomainService) FindRegistroByIDService(id uint) (model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) {
+	logger.Info("Init FindRegistroByID service", zap.Uint("registro_id", id))
+
+	registro, err := s.repo.FindRegistroByID(id)
+	if err != nil {
+		logger.Error("Erro ao buscar registro no repositório", zap.Error(err))
+		return nil, err
+	}
+
+	logger.Info("Registro encontrado com sucesso", zap.Uint("registro_id", registro.GetID()))
+	return registro, nil
+}
