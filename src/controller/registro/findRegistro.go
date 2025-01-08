@@ -22,3 +22,15 @@ func (rc *registroControllerInterface) FindRegistroByID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"registro": registro})
 }
+
+
+func (rc *registroControllerInterface) FindAllRegistros(c *gin.Context) {
+	// Chamar o serviço para buscar todos os registros
+	registros, err := rc.service.FindAllRegistrosService()
+	if err != nil {
+		c.JSON(err.Code, gin.H{"message": err.Message})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"registros": registros})
+}
