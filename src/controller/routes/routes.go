@@ -1,14 +1,21 @@
 package routes
 
 import (
+	"meu-novo-projeto/src/controller/registro" // Import para o controlador de registro
 	"meu-novo-projeto/src/controller/user"
 	"meu-novo-projeto/src/controller/vaga"
-	"meu-novo-projeto/src/controller/veiculo" // Novo import para o controlador de veículo
+	"meu-novo-projeto/src/controller/veiculo"
 	"meu-novo-projeto/src/middleware"
 	"github.com/gin-gonic/gin"
 )
 
-func InitRoutes(r *gin.RouterGroup, userController user.UserControllerInterface, vagaController vaga.VagaControllerInterface, veiculoController veiculo.VeiculoControllerInterface) {
+func InitRoutes(
+	r *gin.RouterGroup,
+	userController user.UserControllerInterface,
+	vagaController vaga.VagaControllerInterface,
+	veiculoController veiculo.VeiculoControllerInterface,
+	registroController registro.RegistroControllerInterface, // Novo parâmetro
+) {
 	// Rotas de usuário
 	userRoutes := r.Group("/users")
 	{
@@ -50,6 +57,20 @@ func InitRoutes(r *gin.RouterGroup, userController user.UserControllerInterface,
 			vehicleRoutes.GET("/", veiculoController.FindAllVeiculos)
 			vehicleRoutes.PUT("/:id", veiculoController.UpdateVeiculo)
 			vehicleRoutes.DELETE("/:id", veiculoController.DeleteVeiculo)
+		}
+	}
+
+	// Rotas de registro de estacionamento
+	registroRoutes := r.Group("/registros")
+	{
+		// Aplica o middleware AuthMiddleware às rotas protegidas de registros
+		registroRoutes.Use(middleware.AuthMiddleware())
+		{
+			registroRoutes.POST("/", registroController.CreateRegistro)
+			registroRoutes.GET("/:id", registroController.FindRegistroByID)
+			registroRoutes.GET("/", registroController.FindAllRegistros)
+			registroRoutes.PUT("/:id", registroController.UpdateRegistro)
+			registroRoutes.DELETE("/:id", registroController.DeleteRegistro)
 		}
 	}
 }
