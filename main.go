@@ -7,10 +7,11 @@ import (
 
 	"meu-novo-projeto/src/configuration/database"
 	"meu-novo-projeto/src/configuration/logger"
+	"meu-novo-projeto/src/controller/registro" // Import para o controlador de registro de estacionamento
 	"meu-novo-projeto/src/controller/routes"
 	"meu-novo-projeto/src/controller/user"
 	"meu-novo-projeto/src/controller/vaga"
-	"meu-novo-projeto/src/controller/veiculo" // Import para o controlador de veículos
+	"meu-novo-projeto/src/controller/veiculo"
 	"meu-novo-projeto/src/middleware"
 	"meu-novo-projeto/src/model/repository"
 	"meu-novo-projeto/src/model/service"
@@ -55,6 +56,10 @@ func main() {
 	veiculoService := service.NewVehicleDomainService(veiculoRepo)
 	veiculoController := veiculo.NewVeiculoControllerInterface(veiculoService)
 
+	registroRepo := repository.NewRegistroEstacionamentoRepository() // Repositório de registros
+	registroService := service.NewRegistroEstacionamentoDomainService(registroRepo) // Serviço de registros
+	registroController := registro.NewRegistroControllerInterface(registroService) // Controlador de registros
+
 	// Configurar o servidor Gin
 	router := gin.Default()
 	router.SetTrustedProxies([]string{"127.0.0.1"})
@@ -64,7 +69,7 @@ func main() {
 
 	// Inicializar rotas com as dependências
 	api := router.Group("/api/v1")
-	routes.InitRoutes(api, userController, vagaController, veiculoController)
+	routes.InitRoutes(api, userController, vagaController, veiculoController, registroController)
 
 	// Rodar a aplicação e tratar erro de inicialização
 	if err := router.Run(fmt.Sprintf(":%s", appPort)); err != nil {
