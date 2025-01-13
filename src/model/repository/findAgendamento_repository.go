@@ -20,3 +20,20 @@ func (r *agendamentoRepository) FindAgendamentoByID(id uint) (model.AgendamentoD
 	}
 	return &agendamento, nil
 }
+
+
+// FindAllAgendamentos busca todos os agendamentos
+func (r *agendamentoRepository) FindAllAgendamentos() ([]model.AgendamentoDomainInterface, *rest_err.RestErr) {
+	var agendamentos []model.AgendamentoDomain
+	if err := r.db.Find(&agendamentos).Error; err != nil {
+		log.Printf("Erro ao buscar agendamentos no banco de dados: %v", err)
+		return nil, rest_err.NewInternalServerError("Erro ao buscar agendamentos", err)
+	}
+
+	agendamentoInterfaces := make([]model.AgendamentoDomainInterface, len(agendamentos))
+	for i, a := range agendamentos {
+		agendamentoInterfaces[i] = &a
+	}
+
+	return agendamentoInterfaces, nil
+}
