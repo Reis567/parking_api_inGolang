@@ -7,7 +7,8 @@ import (
 
 	"meu-novo-projeto/src/configuration/database"
 	"meu-novo-projeto/src/configuration/logger"
-	"meu-novo-projeto/src/controller/registro" // Import para o controlador de registro de estacionamento
+	"meu-novo-projeto/src/controller/agendamento" // Import para o controlador de agendamentos
+	"meu-novo-projeto/src/controller/registro"
 	"meu-novo-projeto/src/controller/routes"
 	"meu-novo-projeto/src/controller/user"
 	"meu-novo-projeto/src/controller/vaga"
@@ -21,23 +22,19 @@ import (
 )
 
 func main() {
-	// Mensagem de log inicial
 	logger.Info("Starting application...")
 
-	// Carregar variáveis de ambiente
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Erro ao carregar o arquivo .env: %v", err)
 	}
 
-	// Conectar ao banco de dados
 	_, err = database.ConnectDatabase()
 	if err != nil {
 		log.Fatalf("Erro ao conectar ao banco de dados: %v", err)
 	}
 	log.Println("Conexão com o banco de dados estabelecida com sucesso!")
 
-	// Usar a porta da aplicação definida nas variáveis de ambiente
 	appPort := os.Getenv("APP_PORT")
 	if appPort == "" {
 		log.Fatal("A porta da aplicação (APP_PORT) não está definida no arquivo .env")
@@ -56,22 +53,22 @@ func main() {
 	veiculoService := service.NewVehicleDomainService(veiculoRepo)
 	veiculoController := veiculo.NewVeiculoControllerInterface(veiculoService)
 
-	registroRepo := repository.NewRegistroEstacionamentoRepository() // Repositório de registros
-	registroService := service.NewRegistroEstacionamentoDomainService(registroRepo) // Serviço de registros
-	registroController := registro.NewRegistroControllerInterface(registroService) // Controlador de registros
+	registroRepo := repository.NewRegistroEstacionamentoRepository()
+	registroService := service.NewRegistroEstacionamentoDomainService(registroRepo)
+	registroController := registro.NewRegistroControllerInterface(registroService)
 
-	// Configurar o servidor Gin
+	agendamentoRepo := repository.NewAgendamentoRepository() // Novo repositório
+	agendamentoService := service.NewAgendamentoDomainService(agendamentoRepo) // Novo serviço
+	agendamentoController := agendamento.NewAgendamentoControllerInterface(agendamentoService) // Novo controlador
+
 	router := gin.Default()
 	router.SetTrustedProxies([]string{"127.0.0.1"})
 
-	// Aplicar middleware de erros
 	router.Use(middleware.ErrorHandlingMiddleware())
 
-	// Inicializar rotas com as dependências
 	api := router.Group("/api/v1")
-	routes.InitRoutes(api, userController, vagaController, veiculoController, registroController)
+	routes.InitRoutes(api, userController, vagaController, veiculoController, registroController, agendamentoController)
 
-	// Rodar a aplicação e tratar erro de inicialização
 	if err := router.Run(fmt.Sprintf(":%s", appPort)); err != nil {
 		log.Fatalf("Erro ao iniciar o servidor: %v", err)
 	}
