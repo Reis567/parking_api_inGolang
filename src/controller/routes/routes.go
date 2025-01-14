@@ -1,7 +1,8 @@
 package routes
 
 import (
-	"meu-novo-projeto/src/controller/registro" // Import para o controlador de registro
+	"meu-novo-projeto/src/controller/agendamento" // Import para o controlador de agendamentos
+	"meu-novo-projeto/src/controller/registro"
 	"meu-novo-projeto/src/controller/user"
 	"meu-novo-projeto/src/controller/vaga"
 	"meu-novo-projeto/src/controller/veiculo"
@@ -14,7 +15,8 @@ func InitRoutes(
 	userController user.UserControllerInterface,
 	vagaController vaga.VagaControllerInterface,
 	veiculoController veiculo.VeiculoControllerInterface,
-	registroController registro.RegistroControllerInterface, // Novo parâmetro
+	registroController registro.RegistroControllerInterface,
+	agendamentoController agendamento.AgendamentoControllerInterface, // Novo parâmetro
 ) {
 	// Rotas de usuário
 	userRoutes := r.Group("/users")
@@ -22,7 +24,6 @@ func InitRoutes(
 		userRoutes.POST("/", userController.CreateUser)
 		userRoutes.POST("/login", userController.LoginUser)
 
-		// Aplica o middleware AuthMiddleware às rotas protegidas
 		userRoutes.Use(middleware.AuthMiddleware())
 		{
 			userRoutes.GET("/:id", userController.FindUserByID)
@@ -35,7 +36,6 @@ func InitRoutes(
 	// Rotas de vaga
 	vagaRoutes := r.Group("/vagas")
 	{
-		// Aplica o middleware AuthMiddleware às rotas protegidas de vagas
 		vagaRoutes.Use(middleware.AuthMiddleware())
 		{
 			vagaRoutes.POST("/", vagaController.CreateVaga)
@@ -49,7 +49,6 @@ func InitRoutes(
 	// Rotas de veículo
 	vehicleRoutes := r.Group("/veiculos")
 	{
-		// Aplica o middleware AuthMiddleware às rotas protegidas de veículos
 		vehicleRoutes.Use(middleware.AuthMiddleware())
 		{
 			vehicleRoutes.POST("/", veiculoController.CreateVeiculo)
@@ -63,7 +62,6 @@ func InitRoutes(
 	// Rotas de registro de estacionamento
 	registroRoutes := r.Group("/registros")
 	{
-		// Aplica o middleware AuthMiddleware às rotas protegidas de registros
 		registroRoutes.Use(middleware.AuthMiddleware())
 		{
 			registroRoutes.POST("/", registroController.CreateRegistro)
@@ -71,6 +69,19 @@ func InitRoutes(
 			registroRoutes.GET("/", registroController.FindAllRegistros)
 			registroRoutes.PUT("/:id", registroController.UpdateRegistro)
 			registroRoutes.DELETE("/:id", registroController.DeleteRegistro)
+		}
+	}
+
+	// Rotas de agendamentos
+	agendamentoRoutes := r.Group("/agendamentos")
+	{
+		agendamentoRoutes.Use(middleware.AuthMiddleware())
+		{
+			agendamentoRoutes.POST("/", agendamentoController.CreateAgendamento)
+			agendamentoRoutes.GET("/:id", agendamentoController.FindAgendamentoByID)
+			agendamentoRoutes.GET("/", agendamentoController.FindAllAgendamentos)
+			agendamentoRoutes.PUT("/:id", agendamentoController.UpdateAgendamento)
+			agendamentoRoutes.DELETE("/:id", agendamentoController.DeleteAgendamento)
 		}
 	}
 }
