@@ -37,3 +37,19 @@ func (s *relatoriosService) CalcularOcupacaoAtual() (float64, *rest_err.RestErr)
     porcentagem := (float64(len(vagasOcupadas)) / float64(totalVagas)) * 100
     return porcentagem, nil
 }
+
+
+func (s *relatoriosService) VeiculosMaisFrequentes(inicio, fim time.Time) ([]string, *rest_err.RestErr) {
+    registros, err := s.registroRepo.FindRegistrosPorPeriodo(inicio, fim)
+    if err != nil {
+        return nil, err
+    }
+
+    frequencia := make(map[string]int)
+    for _, registro := range registros {
+        frequencia[registro.GetPlaca()]++
+    }
+
+    // Ordenar por frequência (opcional).
+    return extrairMaisFrequentes(frequencia), nil
+}
