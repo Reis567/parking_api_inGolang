@@ -23,3 +23,17 @@ func (s *relatoriosService) CalcularReceita(inicio, fim time.Time) (float64, *re
     return receitaTotal, nil
 }
 
+func (s *relatoriosService) CalcularOcupacaoAtual() (float64, *rest_err.RestErr) {
+    vagasOcupadas, err := s.vagaRepo.FindVagasPorStatus("ocupada")
+    if err != nil {
+        return 0, err
+    }
+
+    totalVagas, err := s.vagaRepo.CountTotalVagas()
+    if err != nil || totalVagas == 0 {
+        return 0, rest_err.NewInternalServerError("Erro ao calcular ocupação", err)
+    }
+
+    porcentagem := (float64(len(vagasOcupadas)) / float64(totalVagas)) * 100
+    return porcentagem, nil
+}
