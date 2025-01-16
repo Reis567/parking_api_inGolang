@@ -26,12 +26,14 @@ func NewRelatoriosService(
 func (s *relatoriosService) CalcularReceita(inicio, fim time.Time) (float64, *rest_err.RestErr) {
 	logger.Info("Init CalcularReceita", zap.Time("inicio", inicio), zap.Time("fim", fim))
 
+	// Buscar registros por período usando o repositório
 	registros, err := s.registroRepo.FindRegistrosPorPeriodo(inicio, fim)
 	if err != nil {
 		logger.Error("Erro ao buscar registros por período", zap.Error(err))
 		return 0, err
 	}
 
+	// Calcular a receita total
 	var receitaTotal float64
 	for _, registro := range registros {
 		receitaTotal += registro.GetValorCobrado()
@@ -41,26 +43,30 @@ func (s *relatoriosService) CalcularReceita(inicio, fim time.Time) (float64, *re
 	return receitaTotal, nil
 }
 
-// CalcularOcupacaoAtual calcula a porcentagem de ocupação atual do estacionamento
+
 func (s *relatoriosService) CalcularOcupacaoAtual() (float64, *rest_err.RestErr) {
 	logger.Info("Init CalcularOcupacaoAtual")
 
-	vagasOcupadas, err := s.vagaRepo.FindVagasPorStatus("ocupada")
+	// Contar vagas ocupadas
+	vagasOcupadas, err := s.vagaRepo.CountVagasPorStatus("ocupada")
 	if err != nil {
 		logger.Error("Erro ao buscar vagas ocupadas", zap.Error(err))
 		return 0, err
 	}
 
+	// Contar total de vagas
 	totalVagas, err := s.vagaRepo.CountTotalVagas()
 	if err != nil || totalVagas == 0 {
 		logger.Error("Erro ao calcular total de vagas", zap.Error(err))
 		return 0, rest_err.NewInternalServerError("Erro ao calcular ocupação", err)
 	}
 
-	porcentagem := (float64(len(vagasOcupadas)) / float64(totalVagas)) * 100
+	// Calcular porcentagem
+	porcentagem := (float64(vagasOcupadas) / float64(totalVagas)) * 100
 	logger.Info("Ocupação calculada com sucesso", zap.Float64("ocupacao", porcentagem))
 	return porcentagem, nil
 }
+
 
 // VeiculosMaisFrequentes retorna uma lista de placas de veículos mais frequentes em um intervalo de datas
 func (s *relatoriosService) VeiculosMaisFrequentes(inicio, fim time.Time) ([]string, *rest_err.RestErr) {
