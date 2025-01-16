@@ -5,6 +5,7 @@ import (
 	"meu-novo-projeto/src/configuration/rest_err"
 	"meu-novo-projeto/src/model"
 	"gorm.io/gorm"
+	"log"
 )
 
 // agendamentoRepository é a estrutura que implementa a interface AgendamentoRepository
@@ -28,4 +29,73 @@ type AgendamentoRepository interface {
 	FindAllAgendamentos() ([]model.AgendamentoDomainInterface, *rest_err.RestErr)
 	UpdateAgendamento(agendamento *model.AgendamentoDomain) (*model.AgendamentoDomain, *rest_err.RestErr)
 	DeleteAgendamento(id uint) *rest_err.RestErr
+}
+
+
+func (r *agendamentoRepository) CreateAgendamento(agendamento model.AgendamentoDomainInterface) (model.AgendamentoDomainInterface, *rest_err.RestErr) {
+	if err := r.db.Create(agendamento).Error; err != nil {
+		log.Printf("Erro ao inserir agendamento no banco de dados: %v", err)
+		return nil, rest_err.NewInternalServerError("Erro ao criar agendamento", err)
+	}
+	return agendamento, nil
+}
+
+
+func (r *agendamentoRepository) FindAgendamentoByID(id uint) (model.AgendamentoDomainInterface, *rest_err.RestErr) {
+	var agendamento model.AgendamentoDomain
+
+	if err := r.db.First(&agendamento, id).Error; err != nil {
+		if err.Error() == "record not found" {
+			log.Printf("Agendamento não encontrado: ID %d", id)
+			return nil, rest_err.NewNotFoundError("Agendamento não encontrado")
+		}
+		log.Printf("Erro ao buscar agendamento por ID no banco de dados: %v", err)
+		return nil, rest_err.NewInternalServerError("Erro ao buscar agendamento", err)
+	}
+	return &agendamento, nil
+}
+
+
+// FindAllAgendamentos busca todos os agendamentos
+func (r *agendamentoRepository) FindAllAgendamentos() ([]model.AgendamentoDomainInterface, *rest_err.RestErr) {
+	var agendamentos []model.AgendamentoDomain
+	if err := r.db.Find(&agendamentos).Error; err != nil {
+		log.Printf("Erro ao buscar agendamentos no banco de dados: %v", err)
+		return nil, rest_err.NewInternalServerError("Erro ao buscar agendamentos", err)
+	}
+
+	agendamentoInterfaces := make([]model.AgendamentoDomainInterface, len(agendamentos))
+	for i, a := range agendamentos {
+		agendamentoInterfaces[i] = &a
+	}
+
+	return agendamentoInterfaces, nil
+}
+
+func (r *agendamentoRepository) UpdateAgendamento(agendamento *model.AgendamentoDomain) (*model.AgendamentoDomain, *rest_err.RestErr) {
+	if err := r.db.Save(agendamento).Error; err != nil {
+		log.Printf("Erro ao atualizar agendamento no banco de dados: %v", err)
+		return nil, rest_err.NewInternalServerError("Erro ao atualizar agendamento", err)
+	}
+	return agendamento, nil
+}
+
+
+func (r *agendamentoRepository) DeleteAgendamento(id uint) *rest_err.RestErr {
+	var agendamento model.AgendamentoDomain
+
+	if err := r.db.First(&agendamento, id).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Printf("Agendamento não encontrado para exclusão: ID %d", id)
+			return rest_err.NewNotFoundError("Agendamento não encontrado para exclusão")
+		}
+		log.Printf("Erro ao buscar agendamento para exclusão: %v", err)
+		return rest_err.NewInternalServerError("Erro ao buscar agendamento para exclusão", err)
+	}
+
+	if err := r.db.Delete(&agendamento).Error; err != nil {
+		log.Printf("Erro ao excluir agendamento do banco de dados: %v", err)
+		return rest_err.NewInternalServerError("Erro ao excluir agendamento", err)
+	}
+	return nil
 }
