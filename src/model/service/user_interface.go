@@ -7,6 +7,7 @@ import (
 	"go.uber.org/zap"
 	"time"
 	"meu-novo-projeto/src/configuration/logger"
+	"strconv"
 )
 
 // NewUserDomainService cria uma instância de userDomainService
