@@ -8,6 +8,7 @@ import (
 	"time"
 	"meu-novo-projeto/src/configuration/logger"
 	"strconv"
+	"fmt"
 )
 
 // NewUserDomainService cria uma instância de userDomainService
