@@ -3,24 +3,28 @@ package service
 import (
 	"meu-novo-projeto/src/configuration/logger"
 	"meu-novo-projeto/src/configuration/rest_err"
-	"meu-novo-projeto/src/model"
+
 	"go.uber.org/zap"
 	"time"
+	"meu-novo-projeto/src/model/repository"
 )
 
-// relatoriosService implementa a interface RelatoriosService
+
 type relatoriosService struct {
-	registroRepo model.RegistroRepository
-	vagaRepo     model.VagaRepository
+	registroRepo repository.RegistroEstacionamentoRepository // Atualizado para usar a interface do repositório
+	vagaRepo     repository.VagaRepository                   // Atualizado para usar a interface do repositório
 }
 
-// NewRelatoriosService cria uma instância de relatoriosService
 func NewRelatoriosService(
-	registroRepo model.RegistroRepository,
-	vagaRepo model.VagaRepository,
+	registroRepo repository.RegistroEstacionamentoRepository,
+	vagaRepo repository.VagaRepository,
 ) RelatoriosService {
-	return &relatoriosService{registroRepo, vagaRepo}
+	return &relatoriosService{
+		registroRepo: registroRepo,
+		vagaRepo:     vagaRepo,
+	}
 }
+
 
 // CalcularReceita calcula a receita total em um intervalo de datas
 func (s *relatoriosService) CalcularReceita(inicio, fim time.Time) (float64, *rest_err.RestErr) {
