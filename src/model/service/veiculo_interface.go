@@ -23,3 +23,5 @@ type VehicleDomainService interface {
 	UpdateVehicleService(vehicle model.VehicleDomainInterface) (model.VehicleDomainInterface, *rest_err.RestErr)
 	DeleteVehicleService(id uint) *rest_err.RestErr
 }
+
+

@@ -4,6 +4,9 @@ import (
 	"meu-novo-projeto/src/configuration/rest_err"
 	"meu-novo-projeto/src/model"
 	"meu-novo-projeto/src/model/repository"
+	"go.uber.org/zap"
+	"time"
+	"meu-novo-projeto/src/configuration/logger"
 )
 
 // NewVagaDomainService cria uma instância de vagaDomainService
@@ -22,4 +25,95 @@ type VagaDomainService interface {
 	FindAllVagasService() ([]model.VagaDomainInterface, *rest_err.RestErr)
 	UpdateVagaService(vaga model.VagaDomainInterface) (model.VagaDomainInterface, *rest_err.RestErr)
 	DeleteVagaService(id uint) *rest_err.RestErr
+}
+
+
+func (s *vagaDomainService) CreateVagaService(vaga model.VagaDomainInterface) (model.VagaDomainInterface, *rest_err.RestErr) {
+	logger.Info("Init CreateVagaService", zap.String("journey", "Create vaga"))
+
+	// Atribuir timestamps de criação e atualização
+	vaga.(*model.VagaDomain).CreatedAt = time.Now().Format(time.RFC3339)
+	vaga.(*model.VagaDomain).UpdatedAt = time.Now().Format(time.RFC3339)
+
+	// Criar a vaga no repositório
+	createdVaga, err := s.vagaRepository.CreateVaga(vaga)
+	if err != nil {
+		logger.Error("Erro ao criar vaga no repositório", zap.Error(err))
+		return nil, err
+	}
+
+	logger.Info("Vaga criada com sucesso", zap.String("vaga_id", createdVaga.GetSerial()))
+	return createdVaga, nil
+}
+
+
+func (s *vagaDomainService) FindVagaByIDService(id uint) (model.VagaDomainInterface, *rest_err.RestErr) {
+	logger.Info("Init FindVagaByIDService", zap.Uint("vaga_id", id))
+
+	vaga, err := s.vagaRepository.FindVagaByID(id)
+	if err != nil {
+		logger.Error("Erro ao buscar vaga no repositório", zap.Error(err))
+		return nil, err
+	}
+
+	logger.Info("Vaga encontrada com sucesso", zap.Uint("vaga_id", id))
+	return vaga, nil
+}
+
+// FindAllVagasService busca todas as vagas
+func (s *vagaDomainService) FindAllVagasService() ([]model.VagaDomainInterface, *rest_err.RestErr) {
+	logger.Info("Init FindAllVagasService")
+
+	vagas, err := s.vagaRepository.FindAllVagas()
+	if err != nil {
+		logger.Error("Erro ao buscar todas as vagas no repositório", zap.Error(err))
+		return nil, err
+	}
+
+	logger.Info("Vagas encontradas com sucesso", zap.Int("total", len(vagas)))
+	return vagas, nil
+}
+
+
+
+func (s *vagaDomainService) UpdateVagaService(vaga model.VagaDomainInterface) (model.VagaDomainInterface, *rest_err.RestErr) {
+	logger.Info("Init UpdateVagaService", zap.Uint("vaga_id", vaga.GetID()))
+
+	// Buscar vaga existente
+	existingVaga, err := s.vagaRepository.FindVagaByID(vaga.GetID())
+	if err != nil {
+		logger.Error("Erro ao buscar vaga para atualização", zap.Error(err))
+		return nil, err
+	}
+
+	// Atualizar os campos necessários
+	existingVaga.(*model.VagaDomain).Tipo = vaga.GetTipo()
+	existingVaga.(*model.VagaDomain).Status = vaga.GetStatus()
+	existingVaga.(*model.VagaDomain).Localizacao = vaga.GetLocalizacao()
+	existingVaga.(*model.VagaDomain).UpdatedAt = time.Now().Format(time.RFC3339)
+
+	// Salvar as alterações
+	updatedVaga, updateErr := s.vagaRepository.UpdateVaga(existingVaga.(*model.VagaDomain))
+	if updateErr != nil {
+		logger.Error("Erro ao atualizar vaga no repositório", zap.Error(updateErr))
+		return nil, updateErr
+	}
+
+	logger.Info("Vaga atualizada com sucesso", zap.Uint("vaga_id", updatedVaga.GetID()))
+	return updatedVaga, nil
+}
+
+
+func (s *vagaDomainService) DeleteVagaService(id uint) *rest_err.RestErr {
+	logger.Info("Init DeleteVagaService", zap.Uint("vaga_id", id))
+
+	// Excluir vaga
+	deleteErr := s.vagaRepository.DeleteVaga(id)
+	if deleteErr != nil {
+		logger.Error("Erro ao excluir vaga no repositório", zap.Error(deleteErr))
+		return deleteErr
+	}
+
+	logger.Info("Vaga excluída com sucesso", zap.Uint("vaga_id", id))
+	return nil
 }
