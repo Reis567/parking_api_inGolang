@@ -29,6 +29,8 @@ type VagaRepository interface {
 	FindAllVagas() ([]model.VagaDomainInterface, *rest_err.RestErr)
 	UpdateVaga(vaga *model.VagaDomain) (*model.VagaDomain, *rest_err.RestErr)
 	DeleteVaga(id uint) *rest_err.RestErr
+	CountVagasPorStatus(status string) (int, *rest_err.RestErr) // Novo método
+    CountTotalVagas() (int, *rest_err.RestErr)                  // Novo método
 }
 
 
@@ -131,4 +133,23 @@ func (r *vagaRepository) DeleteVaga(id uint) *rest_err.RestErr {
 
 	log.Printf("Vaga excluída com sucesso: ID %d", id)
 	return nil
+}
+
+
+func (r *vagaRepository) CountVagasPorStatus(status string) (int, *rest_err.RestErr) {
+    var count int64
+    if err := r.db.Model(&model.VagaDomain{}).Where("status = ?", status).Count(&count).Error; err != nil {
+        log.Printf("Erro ao contar vagas com status '%s': %v", status, err)
+        return 0, rest_err.NewInternalServerError("Erro ao contar vagas por status", err)
+    }
+    return int(count), nil
+}
+
+func (r *vagaRepository) CountTotalVagas() (int, *rest_err.RestErr) {
+    var count int64
+    if err := r.db.Model(&model.VagaDomain{}).Count(&count).Error; err != nil {
+        log.Printf("Erro ao contar total de vagas: %v", err)
+        return 0, rest_err.NewInternalServerError("Erro ao contar total de vagas", err)
+    }
+    return int(count), nil
 }
