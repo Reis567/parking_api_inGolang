@@ -6,6 +6,7 @@ import (
 	"meu-novo-projeto/src/model"
 	"gorm.io/gorm"
 	"log"
+	"time"
 )
 
 // registroEstacionamentoRepository é a estrutura que implementa a interface RegistroEstacionamentoRepository
@@ -29,6 +30,7 @@ type RegistroEstacionamentoRepository interface {
 	FindAllRegistros() ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr)
 	UpdateRegistro(registro *model.RegistroEstacionamentoDomain) (*model.RegistroEstacionamentoDomain, *rest_err.RestErr)
 	DeleteRegistro(id uint) *rest_err.RestErr
+	FindRegistrosPorPeriodo(inicio, fim time.Time) ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr)
 }
 
 
@@ -107,4 +109,20 @@ func (r *registroEstacionamentoRepository) DeleteRegistro(id uint) *rest_err.Res
 	}
 	log.Printf("Registro excluído com sucesso: ID %d", id)
 	return nil
+}
+
+
+func (r *registroEstacionamentoRepository) FindRegistrosPorPeriodo(inicio, fim time.Time) ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) {
+    var registros []model.RegistroEstacionamentoDomain
+
+    if err := r.db.Where("hora_entrada BETWEEN ? AND ?", inicio, fim).Find(&registros).Error; err != nil {
+        log.Printf("Erro ao buscar registros no período: %v", err)
+        return nil, rest_err.NewInternalServerError("Erro ao buscar registros por período", err)
+    }
+
+    registrosInterface := make([]model.RegistroEstacionamentoDomainInterface, len(registros))
+    for i, registro := range registros {
+        registrosInterface[i] = &registro
+    }
+    return registrosInterface, nil
 }
