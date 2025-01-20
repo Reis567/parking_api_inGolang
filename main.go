@@ -13,9 +13,11 @@ import (
 	"meu-novo-projeto/src/controller/user"
 	"meu-novo-projeto/src/controller/vaga"
 	"meu-novo-projeto/src/controller/veiculo"
+	"meu-novo-projeto/src/controller/relatorios"
 	"meu-novo-projeto/src/middleware"
 	"meu-novo-projeto/src/model/repository"
 	"meu-novo-projeto/src/model/service"
+	
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -59,7 +61,10 @@ func main() {
 
 	agendamentoRepo := repository.NewAgendamentoRepository() // Novo repositório
 	agendamentoService := service.NewAgendamentoDomainService(agendamentoRepo) // Novo serviço
-	agendamentoController := agendamento.NewAgendamentoControllerInterface(agendamentoService) // Novo controlador
+	agendamentoController := agendamento.NewAgendamentoControllerInterface(agendamentoService)
+
+	relatoriosService := service.NewRelatoriosService(registroRepo, vagaRepo)
+	relatoriosController := relatorios.NewRelatoriosController(relatoriosService)
 
 	router := gin.Default()
 	router.SetTrustedProxies([]string{"127.0.0.1"})
@@ -67,7 +72,7 @@ func main() {
 	router.Use(middleware.ErrorHandlingMiddleware())
 
 	api := router.Group("/api/v1")
-	routes.InitRoutes(api, userController, vagaController, veiculoController, registroController, agendamentoController)
+	routes.InitRoutes(api, userController, vagaController, veiculoController, registroController, agendamentoController, relatoriosController)
 
 	if err := router.Run(fmt.Sprintf(":%s", appPort)); err != nil {
 		log.Fatalf("Erro ao iniciar o servidor: %v", err)
