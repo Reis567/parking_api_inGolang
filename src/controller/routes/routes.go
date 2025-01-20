@@ -6,6 +6,7 @@ import (
 	"meu-novo-projeto/src/controller/user"
 	"meu-novo-projeto/src/controller/vaga"
 	"meu-novo-projeto/src/controller/veiculo"
+	"meu-novo-projeto/src/controller/relatorios"
 	"meu-novo-projeto/src/middleware"
 	"github.com/gin-gonic/gin"
 )
@@ -16,7 +17,8 @@ func InitRoutes(
 	vagaController vaga.VagaControllerInterface,
 	veiculoController veiculo.VeiculoControllerInterface,
 	registroController registro.RegistroControllerInterface,
-	agendamentoController agendamento.AgendamentoControllerInterface, // Novo parâmetro
+	agendamentoController agendamento.AgendamentoControllerInterface,
+	relatoriosController relatorios.RelatoriosController,
 ) {
 	// Rotas de usuário
 	userRoutes := r.Group("/users")
@@ -83,5 +85,11 @@ func InitRoutes(
 			agendamentoRoutes.PUT("/:id", agendamentoController.UpdateAgendamento)
 			agendamentoRoutes.DELETE("/:id", agendamentoController.DeleteAgendamento)
 		}
+	}
+	relatoriosRoutes := r.Group("/relatorios")
+	{
+		relatoriosRoutes.GET("/financeiro", relatoriosController.CalcularReceita)
+		relatoriosRoutes.GET("/ocupacao", relatoriosController.CalcularOcupacaoAtual)
+		relatoriosRoutes.GET("/veiculos", relatoriosController.VeiculosMaisFrequentes)
 	}
 }
