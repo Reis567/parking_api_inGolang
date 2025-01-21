@@ -126,3 +126,21 @@ func (r *registroEstacionamentoRepository) FindRegistrosPorPeriodo(inicio, fim t
     }
     return registrosInterface, nil
 }
+
+
+func (r *registroEstacionamentoRepository) FindRegistrosPorData(data time.Time) ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) {
+	var registros []model.RegistroEstacionamentoDomain
+	inicioDoDia := data.Truncate(24 * time.Hour)                    // Começo do dia
+	fimDoDia := inicioDoDia.Add(24*time.Hour - time.Nanosecond)     // Fim do dia
+
+	if err := r.db.Where("hora_entrada BETWEEN ? AND ?", inicioDoDia, fimDoDia).Find(&registros).Error; err != nil {
+		log.Printf("Erro ao buscar registros na data: %v", err)
+		return nil, rest_err.NewInternalServerError("Erro ao buscar registros por data", err)
+	}
+
+	registrosInterface := make([]model.RegistroEstacionamentoDomainInterface, len(registros))
+	for i, registro := range registros {
+		registrosInterface[i] = &registro
+	}
+	return registrosInterface, nil
+}
