@@ -31,6 +31,7 @@ type RegistroEstacionamentoRepository interface {
 	UpdateRegistro(registro *model.RegistroEstacionamentoDomain) (*model.RegistroEstacionamentoDomain, *rest_err.RestErr)
 	DeleteRegistro(id uint) *rest_err.RestErr
 	FindRegistrosPorPeriodo(inicio, fim time.Time) ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr)
+	FindRegistrosPorData(data time.Time) ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) 
 }
 
 
