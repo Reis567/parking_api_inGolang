@@ -25,6 +25,7 @@ type RegistroEstacionamentoDomainService interface {
 	FindAllRegistrosService() ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr)
 	UpdateRegistroService(registro model.RegistroEstacionamentoDomainInterface) (model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr)
 	DeleteRegistroService(id uint) *rest_err.RestErr
+	FindRegistrosPorDataService(data time.Time) ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) 
 }
 func (s *registroEstacionamentoDomainService) CreateRegistroService(registro model.RegistroEstacionamentoDomainInterface) (model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) {
 	logger.Info("Init CreateRegistro service", zap.String("journey", "Create registro"))
@@ -102,4 +103,18 @@ func (s *registroEstacionamentoDomainService) DeleteRegistroService(id uint) *re
 
 	logger.Info("Registro excluído com sucesso", zap.Uint("registro_id", id))
 	return nil
+}
+
+
+func (s *registroEstacionamentoDomainService) FindRegistrosPorDataService(data time.Time) ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) {
+	logger.Info("Init FindRegistrosPorData service", zap.Time("data", data))
+
+	registros, err := s.repo.FindRegistrosPorData(data)
+	if err != nil {
+		logger.Error("Erro ao buscar registros no repositório", zap.Error(err))
+		return nil, err
+	}
+
+	logger.Info("Registros encontrados com sucesso", zap.Int("count", len(registros)))
+	return registros, nil
 }
