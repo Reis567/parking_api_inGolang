@@ -7,6 +7,7 @@ import (
 	"meu-novo-projeto/src/controller/vaga"
 	"meu-novo-projeto/src/controller/veiculo"
 	"meu-novo-projeto/src/controller/relatorios"
+	"meu-novo-projeto/src/controller/calendario"
 	"meu-novo-projeto/src/middleware"
 	"github.com/gin-gonic/gin"
 )
@@ -19,6 +20,7 @@ func InitRoutes(
 	registroController registro.RegistroControllerInterface,
 	agendamentoController agendamento.AgendamentoControllerInterface,
 	relatoriosController relatorios.RelatoriosController,
+	calendarioController calendario.CalendarioControllerInterface,
 ) {
 	// Rotas de usuário
 	userRoutes := r.Group("/users")
@@ -91,5 +93,9 @@ func InitRoutes(
 		relatoriosRoutes.GET("/financeiro", relatoriosController.CalcularReceita)
 		relatoriosRoutes.GET("/ocupacao", relatoriosController.CalcularOcupacaoAtual)
 		relatoriosRoutes.GET("/veiculos", relatoriosController.VeiculosMaisFrequentes)
+	}
+	calendarioRoutes := r.Group("/calendario")
+	{
+		calendarioRoutes.GET("/:data", calendarioController.ListarRegistrosPorData)
 	}
 }
