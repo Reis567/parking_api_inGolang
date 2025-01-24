@@ -17,7 +17,7 @@ import (
 	"meu-novo-projeto/src/middleware"
 	"meu-novo-projeto/src/model/repository"
 	"meu-novo-projeto/src/model/service"
-	
+	"meu-novo-projeto/src/controller/calendario"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -66,13 +66,26 @@ func main() {
 	relatoriosService := service.NewRelatoriosService(registroRepo, vagaRepo)
 	relatoriosController := relatorios.NewRelatoriosController(relatoriosService)
 
+
+	calendarioController := calendario.NewCalendarioController(registroService)
+
+
 	router := gin.Default()
 	router.SetTrustedProxies([]string{"127.0.0.1"})
 
 	router.Use(middleware.ErrorHandlingMiddleware())
 
 	api := router.Group("/api/v1")
-	routes.InitRoutes(api, userController, vagaController, veiculoController, registroController, agendamentoController, relatoriosController)
+	routes.InitRoutes(api,
+		 userController,
+		  vagaController,
+		   veiculoController,
+		    registroController,
+			 agendamentoController,
+			  relatoriosController,
+			  calendarioController,
+
+			)
 
 	if err := router.Run(fmt.Sprintf(":%s", appPort)); err != nil {
 		log.Fatalf("Erro ao iniciar o servidor: %v", err)
