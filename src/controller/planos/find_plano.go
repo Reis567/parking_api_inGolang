@@ -21,3 +21,14 @@ func (bc *billingPlanControllerInterface) FindBillingPlanByID(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"plano": plan})
 }
+
+
+func (bc *billingPlanControllerInterface) FindAllBillingPlans(c *gin.Context) {
+	plans, errRes := bc.service.FindAllBillingPlansService()
+	if errRes != nil {
+		c.JSON(errRes.Code, gin.H{"message": errRes.Message})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"planos": plans})
+}
