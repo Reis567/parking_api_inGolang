@@ -19,6 +19,7 @@ type RegistroControllerInterface interface {
 	FindAllRegistros(c *gin.Context)
 	UpdateRegistro(c *gin.Context)
 	DeleteRegistro(c *gin.Context)
+	RegistrarEntrada(c *gin.Context) // Novo método
 }
 
 // registroControllerInterface implementa RegistroControllerInterface
