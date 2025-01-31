@@ -29,6 +29,7 @@ type AgendamentoRepository interface {
 	FindAllAgendamentos() ([]model.AgendamentoDomainInterface, *rest_err.RestErr)
 	UpdateAgendamento(agendamento *model.AgendamentoDomain) (*model.AgendamentoDomain, *rest_err.RestErr)
 	DeleteAgendamento(id uint) *rest_err.RestErr
+	VerificarReservaPorPlaca(placa string) (model.AgendamentoDomainInterface, *rest_err.RestErr) // Novo método
 }
 
 
@@ -98,4 +99,21 @@ func (r *agendamentoRepository) DeleteAgendamento(id uint) *rest_err.RestErr {
 		return rest_err.NewInternalServerError("Erro ao excluir agendamento", err)
 	}
 	return nil
+}
+
+
+func (r *agendamentoRepository) VerificarReservaPorPlaca(placa string) (model.AgendamentoDomainInterface, *rest_err.RestErr) {
+	var reserva model.AgendamentoDomain
+
+	// Verificar se há uma reserva confirmada para a placa
+	if err := r.db.Where("placa = ? AND status = ?", placa, "confirmada").First(&reserva).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Printf("Nenhuma reserva confirmada encontrada para a placa: %s", placa)
+			return nil, nil // Retorna nil indicando que não há reserva
+		}
+		log.Printf("Erro ao verificar reserva no banco de dados: %v", err)
+		return nil, rest_err.NewInternalServerError("Erro ao verificar reserva", err)
+	}
+
+	return &reserva, nil
 }
