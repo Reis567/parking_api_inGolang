@@ -26,6 +26,7 @@ type RegistroEstacionamentoDomainService interface {
 	UpdateRegistroService(registro model.RegistroEstacionamentoDomainInterface) (model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr)
 	DeleteRegistroService(id uint) *rest_err.RestErr
 	FindRegistrosPorDataService(data time.Time) ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) 
+	VerificarReservaPorPlacaService(placa string) (model.AgendamentoDomainInterface, *rest_err.RestErr)
 }
 func (s *registroEstacionamentoDomainService) CreateRegistroService(registro model.RegistroEstacionamentoDomainInterface) (model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) {
 	logger.Info("Init CreateRegistro service", zap.String("journey", "Create registro"))
