@@ -26,7 +26,7 @@ type RegistroEstacionamentoDomainService interface {
 	UpdateRegistroService(registro model.RegistroEstacionamentoDomainInterface) (model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr)
 	DeleteRegistroService(id uint) *rest_err.RestErr
 	FindRegistrosPorDataService(data time.Time) ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) 
-	VerificarReservaPorPlacaService(placa string) (model.AgendamentoDomainInterface, *rest_err.RestErr)
+
 }
 func (s *registroEstacionamentoDomainService) CreateRegistroService(registro model.RegistroEstacionamentoDomainInterface) (model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) {
 	logger.Info("Init CreateRegistro service", zap.String("journey", "Create registro"))
@@ -122,21 +122,3 @@ func (s *registroEstacionamentoDomainService) FindRegistrosPorDataService(data t
 
 
 
-func (s *registroEstacionamentoDomainService) VerificarReservaPorPlacaService(placa string) (model.AgendamentoDomainInterface, *rest_err.RestErr) {
-	logger.Info("Verificando reserva para a placa", zap.String("placa", placa))
-
-	// Chamar o repositório para verificar se há uma reserva confirmada para a placa
-	reserva, err := s.repo.VerificarReservaPorPlaca(placa)
-	if err != nil {
-		logger.Error("Erro ao verificar reserva no repositório", zap.Error(err))
-		return nil, err
-	}
-
-	if reserva == nil {
-		logger.Info("Nenhuma reserva encontrada para a placa", zap.String("placa", placa))
-		return nil, rest_err.NewNotFoundError("Nenhuma reserva encontrada para esta placa")
-	}
-
-	logger.Info("Reserva encontrada com sucesso", zap.Uint("reserva_id", reserva.GetID()))
-	return reserva, nil
-}

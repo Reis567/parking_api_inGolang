@@ -27,6 +27,7 @@ type AgendamentoDomainService interface {
 	DeleteAgendamentoService(id uint) *rest_err.RestErr
 	//FindAgendamentosByPeriod(inicio, fim time.Time) ([]model.AgendamentoDomainInterface, *rest_err.RestErr)
 	//CancelAgendamentoService(id uint) *rest_err.RestErr
+	VerificarReservaPorPlacaService(placa string) (model.AgendamentoDomainInterface, *rest_err.RestErr)
 }
 
 
@@ -111,4 +112,24 @@ func (s *agendamentoDomainService) UpdateAgendamentoService(agendamento model.Ag
 
 	logger.Info("Agendamento atualizado com sucesso", zap.Uint("agendamento_id", updatedAgendamento.GetID()))
 	return updatedAgendamento, nil
+}
+
+
+func (s *agendamentoDomainService) VerificarReservaPorPlacaService(placa string) (model.AgendamentoDomainInterface, *rest_err.RestErr) {
+	logger.Info("Verificando reserva para a placa", zap.String("placa", placa))
+
+	// Chamar o repositório para verificar se há uma reserva confirmada para a placa
+	reserva, err := s.agendamentoRepository.VerificarReservaPorPlaca(placa)
+	if err != nil {
+		logger.Error("Erro ao verificar reserva no repositório", zap.Error(err))
+		return nil, err
+	}
+
+	if reserva == nil {
+		logger.Info("Nenhuma reserva encontrada para a placa", zap.String("placa", placa))
+		return nil, rest_err.NewNotFoundError("Nenhuma reserva encontrada para esta placa")
+	}
+
+	logger.Info("Reserva encontrada com sucesso", zap.Uint("reserva_id", reserva.GetID()))
+	return reserva, nil
 }
