@@ -1,4 +1,4 @@
-package registro
+package agendamento
 
 import (
 	"meu-novo-projeto/src/configuration/rest_err"
@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-func (rc *registroControllerInterface) RegistrarEntrada(c *gin.Context) {
+func (ac *agendamentoControllerInterface) RegistrarEntrada(c *gin.Context) {
 	var entradaRequest struct {
 		Placa          string `json:"placa" binding:"required"`
 		Modelo         string `json:"modelo" binding:"required"`
@@ -25,7 +25,7 @@ func (rc *registroControllerInterface) RegistrarEntrada(c *gin.Context) {
 	}
 
 	// 1. Verificar se existe uma reserva
-	reserva, reservaErr := rc.service.VerificarReservaPorPlacaService(entradaRequest.Placa)
+	reserva, reservaErr := ac.VerificarReservaPorPlacaService(entradaRequest.Placa)
 	var vagaID uint
 
 	if reservaErr == nil && reserva != nil {
@@ -33,7 +33,7 @@ func (rc *registroControllerInterface) RegistrarEntrada(c *gin.Context) {
 		vagaID = reserva.GetVagaID()
 	} else {
 		// Se não houver uma reserva, buscar a primeira vaga disponível
-		vagaDisponivel, vagaErr := rc.service.BuscarVagaDisponivelService(entradaRequest.TipoVaga)
+		vagaDisponivel, vagaErr := ac.BuscarVagaDisponivelService(entradaRequest.TipoVaga)
 		if vagaErr != nil {
 			c.JSON(http.StatusNotFound, gin.H{"message": "Nenhuma vaga disponível para o tipo informado"})
 			return
@@ -50,14 +50,14 @@ func (rc *registroControllerInterface) RegistrarEntrada(c *gin.Context) {
 	)
 
 	// 3. Salvar o registro no banco de dados
-	createdRegistro, err := rc.service.CreateRegistroService(registro)
+	createdRegistro, err := ac.CreateRegistroService(registro)
 	if err != nil {
 		c.JSON(err.Code, gin.H{"message": err.Message})
 		return
 	}
 
 	// 4. Atualizar o status da vaga para "ocupada"
-	vagaUpdateErr := rc.service.AtualizarStatusVagaService(vagaID, "ocupada")
+	vagaUpdateErr := ac.AtualizarStatusVagaService(vagaID, "ocupada")
 	if vagaUpdateErr != nil {
 		c.JSON(vagaUpdateErr.Code, gin.H{"message": vagaUpdateErr.Message})
 		return
