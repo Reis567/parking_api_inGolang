@@ -24,5 +24,6 @@ type AgendamentoControllerInterface interface {
 
 // agendamentoControllerInterface implementa AgendamentoControllerInterface
 type agendamentoControllerInterface struct {
-	service service.AgendamentoDomainService
+	service     service.AgendamentooDomainService
+	vagaService service.VagaDomainService
 }

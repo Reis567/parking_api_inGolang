@@ -25,7 +25,13 @@ type VagaDomainService interface {
 	FindAllVagasService() ([]model.VagaDomainInterface, *rest_err.RestErr)
 	UpdateVagaService(vaga model.VagaDomainInterface) (model.VagaDomainInterface, *rest_err.RestErr)
 	DeleteVagaService(id uint) *rest_err.RestErr
+
+	// Novos métodos:
+	BuscarVagaDisponivelService(tipo string) (model.VagaDomainInterface, *rest_err.RestErr)
+	CreateRegistroService(registro model.RegistroEstacionamentoDomainInterface) (model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr)
+	AtualizarStatusVagaService(id uint, status string) *rest_err.RestErr
 }
+
 
 
 func (s *vagaDomainService) CreateVagaService(vaga model.VagaDomainInterface) (model.VagaDomainInterface, *rest_err.RestErr) {
