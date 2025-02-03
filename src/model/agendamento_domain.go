@@ -7,6 +7,7 @@ import (
 )
 
 // AgendamentoDomainInterface define os métodos que a entidade Agendamento deve implementar
+// AgendamentoDomainInterface define os métodos que a entidade Agendamento deve implementar
 type AgendamentoDomainInterface interface {
 	GetID() uint
 	GetPlaca() string
@@ -18,6 +19,9 @@ type AgendamentoDomainInterface interface {
 	GetJSONValue() (string, error)
 	SetID(id uint)
 	AtualizarStatus(status string)
+	
+	// NOVO MÉTODO para obter o ID da vaga associada à reserva
+	GetVagaID() uint
 }
 
 // NewAgendamentoDomain cria uma nova instância de AgendamentoDomain
@@ -29,6 +33,7 @@ func NewAgendamentoDomain(placa string, tipoVaga string, dataHoraReserva string,
 		Status:          status,
 		CreatedAt:       time.Now().Format(time.RFC3339),
 		UpdatedAt:       time.Now().Format(time.RFC3339),
+		
 	}
 	return agendamento
 }
@@ -39,7 +44,8 @@ type AgendamentoDomain struct {
 	Placa           string `json:"placa"`              // Placa do veículo
 	TipoVaga        string `json:"tipo_vaga"`         // Tipo de vaga: "carro" ou "moto"
 	DataHoraReserva string `json:"data_hora_reserva"` // Data e hora da reserva
-	Status          string `json:"status"`           // Status: "confirmada", "cancelada", "concluida"
+	Status          string `json:"status"`
+	VagaID          uint   `json:"vaga_id"`
 	CreatedAt       string `json:"created_at"`
 	UpdatedAt       string `json:"updated_at"`
 }
@@ -60,6 +66,11 @@ func (ad *AgendamentoDomain) GetTipoVaga() string {
 func (ad *AgendamentoDomain) GetDataHoraReserva() string {
 	return ad.DataHoraReserva
 }
+// GetVagaID retorna o ID da vaga associada ao agendamento
+func (ad *AgendamentoDomain) GetVagaID() uint {
+	return ad.VagaID
+}
+
 
 func (ad *AgendamentoDomain) GetStatus() string {
 	return ad.Status

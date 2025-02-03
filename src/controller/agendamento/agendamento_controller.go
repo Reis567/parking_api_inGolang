@@ -6,11 +6,13 @@ import (
 )
 
 // NewAgendamentoControllerInterface cria uma nova instância de AgendamentoControllerInterface
-func NewAgendamentoControllerInterface(serviceInterface service.AgendamentoDomainService) AgendamentoControllerInterface {
+func NewAgendamentoControllerInterface(agendamentoService service.AgendamentoDomainService, vagaService service.VagaDomainService) AgendamentoControllerInterface {
 	return &agendamentoControllerInterface{
-		service: serviceInterface,
+		service:     agendamentoService,
+		vagaService: vagaService,
 	}
 }
+
 
 // AgendamentoControllerInterface define os métodos do controlador de agendamento
 type AgendamentoControllerInterface interface {
@@ -24,6 +26,6 @@ type AgendamentoControllerInterface interface {
 
 // agendamentoControllerInterface implementa AgendamentoControllerInterface
 type agendamentoControllerInterface struct {
-	service     service.AgendamentooDomainService
+	service     service.AgendamentoDomainService
 	vagaService service.VagaDomainService
 }

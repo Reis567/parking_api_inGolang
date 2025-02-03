@@ -1,9 +1,7 @@
 package agendamento
 
 import (
-	"meu-novo-projeto/src/configuration/rest_err"
 	"meu-novo-projeto/src/model"
-	"meu-novo-projeto/src/model/service"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
