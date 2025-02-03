@@ -123,3 +123,16 @@ func (s *vagaDomainService) DeleteVagaService(id uint) *rest_err.RestErr {
 	logger.Info("Vaga excluída com sucesso", zap.Uint("vaga_id", id))
 	return nil
 }
+
+
+
+// BuscarVagaDisponivelService busca a primeira vaga disponível para o tipo informado.
+func (s *vagaDomainService) BuscarVagaDisponivelService(tipo string) (model.VagaDomainInterface, *rest_err.RestErr) {
+	// Exemplo: Chame um método do repositório que retorne uma vaga disponível
+	vaga, err := s.vagaRepository.FindVagaDisponivel(tipo)
+	if err != nil {
+		logger.Error("Erro ao buscar vaga disponível", zap.Error(err))
+		return nil, err
+	}
+	return vaga, nil
+}
