@@ -23,15 +23,21 @@ func NewVagaRepositoryWithDB(customDB *gorm.DB) VagaRepository {
 }
 
 // VagaRepository interface define os métodos para gerenciar Vagas
+// VagaRepository interface define os métodos para gerenciar Vagas
 type VagaRepository interface {
 	CreateVaga(vaga model.VagaDomainInterface) (model.VagaDomainInterface, *rest_err.RestErr)
 	FindVagaByID(id uint) (model.VagaDomainInterface, *rest_err.RestErr)
 	FindAllVagas() ([]model.VagaDomainInterface, *rest_err.RestErr)
 	UpdateVaga(vaga *model.VagaDomain) (*model.VagaDomain, *rest_err.RestErr)
 	DeleteVaga(id uint) *rest_err.RestErr
-	CountVagasPorStatus(status string) (int, *rest_err.RestErr) // Novo método
-    CountTotalVagas() (int, *rest_err.RestErr)                  // Novo método
+	CountVagasPorStatus(status string) (int, *rest_err.RestErr)
+	CountTotalVagas() (int, *rest_err.RestErr)
+
+	// NOVOS MÉTODOS:
+	FindVagaDisponivel(tipo string) (model.VagaDomainInterface, *rest_err.RestErr)
+	CreateRegistro(registro model.RegistroEstacionamentoDomainInterface) (model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr)
 }
+
 
 
 func (r *vagaRepository) CreateVaga(vaga model.VagaDomainInterface) (model.VagaDomainInterface, *rest_err.RestErr) {
@@ -153,3 +159,22 @@ func (r *vagaRepository) CountTotalVagas() (int, *rest_err.RestErr) {
     }
     return int(count), nil
 }
+
+
+func (r *vagaRepository) FindVagaDisponivel(tipo string) (model.VagaDomainInterface, *rest_err.RestErr) {
+	var vaga model.VagaDomain
+
+	// Buscando vaga que tenha o tipo desejado e esteja com status "disponivel"
+	if err := r.db.Where("tipo = ? AND status = ?", tipo, "disponivel").First(&vaga).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Printf("Nenhuma vaga disponível para o tipo: %s", tipo)
+			return nil, rest_err.NewNotFoundError("Nenhuma vaga disponível para o tipo informado")
+		}
+		log.Printf("Erro ao buscar vaga disponível: %v", err)
+		return nil, rest_err.NewInternalServerError("Erro ao buscar vaga disponível", err)
+	}
+
+	return &vaga, nil
+}
+
+
