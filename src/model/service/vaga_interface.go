@@ -136,3 +136,15 @@ func (s *vagaDomainService) BuscarVagaDisponivelService(tipo string) (model.Vaga
 	}
 	return vaga, nil
 }
+
+// CreateRegistroService salva o registro de entrada no estacionamento.
+func (s *vagaDomainService) CreateRegistroService(registro model.RegistroEstacionamentoDomainInterface) (model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) {
+	// Exemplo: Se você tiver um repositório para registros, delegue a criação para ele.
+	// Caso contrário, implemente a lógica necessária para salvar o registro.
+	createdRegistro, err := s.vagaRepository.CreateRegistro(registro)
+	if err != nil {
+		logger.Error("Erro ao criar registro", zap.Error(err))
+		return nil, err
+	}
+	return createdRegistro, nil
+}
