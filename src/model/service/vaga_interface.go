@@ -148,3 +148,25 @@ func (s *vagaDomainService) CreateRegistroService(registro model.RegistroEstacio
 	}
 	return createdRegistro, nil
 }
+
+// AtualizarStatusVagaService atualiza o status da vaga.
+func (s *vagaDomainService) AtualizarStatusVagaService(id uint, status string) *rest_err.RestErr {
+	// Buscar a vaga existente
+	vaga, err := s.vagaRepository.FindVagaByID(id)
+	if err != nil {
+		logger.Error("Erro ao buscar vaga para atualizar status", zap.Error(err))
+		return err
+	}
+
+	// Atualizar o status
+	vaga.(*model.VagaDomain).Status = status
+	vaga.(*model.VagaDomain).UpdatedAt = time.Now().Format(time.RFC3339)
+
+	_, updateErr := s.vagaRepository.UpdateVaga(vaga.(*model.VagaDomain))
+	if updateErr != nil {
+		logger.Error("Erro ao atualizar status da vaga", zap.Error(updateErr))
+		return updateErr
+	}
+
+	return nil
+}
