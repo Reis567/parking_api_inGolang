@@ -61,7 +61,7 @@ func main() {
 
 	agendamentoRepo := repository.NewAgendamentoRepository() // Novo repositório
 	agendamentoService := service.NewAgendamentoDomainService(agendamentoRepo) // Novo serviço
-	agendamentoController := agendamento.NewAgendamentoControllerInterface(agendamentoService, vagaService)
+	agendamentoController := agendamento.NewAgendamentoControllerInterface(agendamentoService, vagaService,registroService)
 
 	relatoriosService := service.NewRelatoriosService(registroRepo, vagaRepo)
 	relatoriosController := relatorios.NewRelatoriosController(relatoriosService)

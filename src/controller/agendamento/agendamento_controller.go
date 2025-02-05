@@ -6,10 +6,11 @@ import (
 )
 
 // NewAgendamentoControllerInterface cria uma nova instância de AgendamentoControllerInterface
-func NewAgendamentoControllerInterface(agendamentoService service.AgendamentoDomainService, vagaService service.VagaDomainService) AgendamentoControllerInterface {
+func NewAgendamentoControllerInterface(agendamentoService service.AgendamentoDomainService, vagaService service.VagaDomainService , registroService service.RegistroEstacionamentoDomainService) AgendamentoControllerInterface {
 	return &agendamentoControllerInterface{
 		service:     agendamentoService,
 		vagaService: vagaService,
+		registroService : registroService,
 	}
 }
 
@@ -28,4 +29,5 @@ type AgendamentoControllerInterface interface {
 type agendamentoControllerInterface struct {
 	service     service.AgendamentoDomainService
 	vagaService service.VagaDomainService
+	registroService service.RegistroEstacionamentoDomainService
 }

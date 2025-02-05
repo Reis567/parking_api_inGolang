@@ -35,7 +35,7 @@ type VagaRepository interface {
 
 	// NOVOS MÉTODOS:
 	FindVagaDisponivel(tipo string) (model.VagaDomainInterface, *rest_err.RestErr)
-	CreateRegistro(registro model.RegistroEstacionamentoDomainInterface) (model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr)
+
 }
 
 
@@ -179,10 +179,3 @@ func (r *vagaRepository) FindVagaDisponivel(tipo string) (model.VagaDomainInterf
 
 
 
-func (r *vagaRepository) CreateRegistro(registro model.RegistroEstacionamentoDomainInterface) (model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) {
-	if err := r.db.Create(registro).Error; err != nil {
-		log.Printf("Erro ao criar registro no banco de dados: %v", err)
-		return nil, rest_err.NewInternalServerError("Erro ao criar registro", err)
-	}
-	return registro, nil
-}

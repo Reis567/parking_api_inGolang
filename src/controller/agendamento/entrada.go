@@ -48,7 +48,7 @@ func (ac *agendamentoControllerInterface) RegistrarEntrada(c *gin.Context) {
 	)
 
 	// 3. Salvar o registro no banco de dados
-	createdRegistro, err := ac.vagaService.CreateRegistroService(registro)
+	createdRegistro, err := ac.registroService.CreateRegistroService(registro)
 	if err != nil {
 		c.JSON(err.Code, gin.H{"message": err.Message})
 		return
