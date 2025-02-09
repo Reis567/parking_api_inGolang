@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"time"
+	"strconv"
 )
 
 func (ac *agendamentoControllerInterface) RegistrarEntrada(c *gin.Context) {
@@ -62,4 +63,30 @@ func (ac *agendamentoControllerInterface) RegistrarEntrada(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"message": "Entrada registrada com sucesso", "registro": createdRegistro})
+}
+
+
+func (ac *agendamentoControllerInterface) FinalizarEstacionamento(c *gin.Context) {
+	// Obter o registroID da URL (exemplo: /estacionamento/saida/{registroID})
+	registroIDParam := c.Param("registroID")
+	registroID, err := strconv.ParseUint(registroIDParam, 10, 32)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "RegistroID inválido", "error": err.Error()})
+		return
+	}
+
+	// Definir a hora de saída como a hora atual
+	horaSaida := time.Now().Format(time.RFC3339)
+
+	// Chamar o service para finalizar o estacionamento
+	resultado, serviceErr := ac.service.FinalizarEstacionamentoService(uint(registroID), horaSaida)
+	if serviceErr != nil {
+		c.JSON(serviceErr.Code, gin.H{"message": serviceErr.Message})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message":   "Estacionamento finalizado com sucesso",
+		"resultado": resultado,
+	})
 }

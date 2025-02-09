@@ -22,7 +22,7 @@ type AgendamentoControllerInterface interface {
 	FindAllAgendamentos(c *gin.Context)
 	UpdateAgendamento(c *gin.Context)
 	DeleteAgendamento(c *gin.Context)
-	RegistrarEntrada(c *gin.Context) // Novo método
+	RegistrarEntrada(c *gin.Context) 
 }
 
 // agendamentoControllerInterface implementa AgendamentoControllerInterface
