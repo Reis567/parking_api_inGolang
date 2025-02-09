@@ -7,8 +7,7 @@ import (
 		"meu-novo-projeto/src/configuration/logger"
 	"go.uber.org/zap"
 	"time"
-	"os"
-	"strconv"
+
 )
 
 // NewRegistroEstacionamentoDomainService cria uma instância de registroEstacionamentoDomainService
@@ -124,61 +123,3 @@ func (s *registroEstacionamentoDomainService) FindRegistrosPorDataService(data t
 }
 
 
-
-
-func (s *registroEstacionamentoDomainService) FinalizarEstacionamentoService(registroID uint, horaSaida string) (interface{}, *rest_err.RestErr) {
-	// Buscar o registro de estacionamento pelo ID
-	registro, err := s.repo.FindRegistroByID(registroID)
-	if err != nil {
-		return nil, err
-	}
-
-	// Obter o valor da tarifa por hora da variável de ambiente "TARIFFA_HORA"
-	tarifaStr := os.Getenv("TARIFFA_HORA")
-	if tarifaStr == "" {
-		tarifaStr = "5.0" // valor padrão caso a variável não esteja definida
-	}
-	valorPorHora, err := strconv.ParseFloat(tarifaStr, 64)
-	if err != nil {
-		return nil, rest_err.NewInternalServerError("Erro ao converter a tarifa por hora", err)
-	}
-
-	// Calcular o tempo decorrido e o valor a ser cobrado
-	horaEntrada, err := time.Parse(time.RFC3339, registro.GetHoraEntrada())
-	if err != nil {
-		return nil, rest_err.NewInternalServerError("Erro ao processar hora de entrada", err)
-	}
-	saida, err := time.Parse(time.RFC3339, horaSaida)
-	if err != nil {
-		return nil, rest_err.NewInternalServerError("Erro ao processar hora de saída", err)
-	}
-	duracao := saida.Sub(horaEntrada)
-
-	horas := duracao.Hours()
-	if horas < 1 {
-		horas = 1
-	}
-	valorCobrado := valorPorHora * horas
-
-	// Atualizar o registro com os dados da saída
-	registro.RegistrarSaida(horaSaida, valorCobrado)
-	updatedRegistro, updateErr := s.repo.UpdateRegistro(registro.(*model.RegistroEstacionamentoDomain))
-	if updateErr != nil {
-		return nil, updateErr
-	}
-
-	// Atualizar a vaga para o status "disponivel"
-	vaga, vagaErr := s.vagaRepo.FindVagaByID(registro.GetVagaID())
-	if vagaErr != nil {
-		return nil, vagaErr
-	}
-	vaga.(*model.VagaDomain).Status = "disponivel"
-	vaga.(*model.VagaDomain).UpdatedAt = time.Now().Format(time.RFC3339)
-	_, vagaUpdateErr := s.vagaRepo.UpdateVaga(vaga.(*model.VagaDomain))
-	if vagaUpdateErr != nil {
-		return nil, vagaUpdateErr
-	}
-
-	// Retornar o registro atualizado ou os dados do cálculo
-	return updatedRegistro, nil
-}

@@ -7,15 +7,19 @@ import (
 	"time"
 	"go.uber.org/zap"
 	"meu-novo-projeto/src/configuration/logger"
+	"os"
+	"strconv"
 )
 
 // NewAgendamentoDomainService cria uma instância de agendamentoDomainService
-func NewAgendamentoDomainService(agendamentoRepository repository.AgendamentoRepository) AgendamentoDomainService {
-	return &agendamentoDomainService{agendamentoRepository}
+func NewAgendamentoDomainService(agendamentoRepository repository.AgendamentoRepository,vagaRepo repository.VagaRepository,RgRepo repository.RegistroEstacionamentoRepository) AgendamentoDomainService {
+	return &agendamentoDomainService{agendamentoRepository,vagaRepo,RgRepo}
 }
 
 type agendamentoDomainService struct {
 	agendamentoRepository repository.AgendamentoRepository
+	vagaRepo repository.VagaRepository
+	RgRepo repository.RegistroEstacionamentoRepository
 }
 
 // AgendamentoDomainService define os métodos para o serviço de agendamento
@@ -28,6 +32,7 @@ type AgendamentoDomainService interface {
 	//FindAgendamentosByPeriod(inicio, fim time.Time) ([]model.AgendamentoDomainInterface, *rest_err.RestErr)
 	//CancelAgendamentoService(id uint) *rest_err.RestErr
 	VerificarReservaPorPlacaService(placa string) (model.AgendamentoDomainInterface, *rest_err.RestErr)
+	FinalizarEstacionamentoService(registroID uint, horaSaida string) (interface{}, *rest_err.RestErr)
 }
 
 
@@ -132,4 +137,62 @@ func (s *agendamentoDomainService) VerificarReservaPorPlacaService(placa string)
 
 	logger.Info("Reserva encontrada com sucesso", zap.Uint("reserva_id", reserva.GetID()))
 	return reserva, nil
+}
+
+
+
+
+func (s *agendamentoDomainService) FinalizarEstacionamentoService(registroID uint, horaSaida string) (interface{}, *rest_err.RestErr) {
+	// Buscar o registro de estacionamento pelo ID
+	registro, err := s.RgRepo.FindRegistroByID(registroID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Obter o valor da tarifa por hora da variável de ambiente "TARIFFA_HORA"
+	tarifaStr := os.Getenv("TARIFFA_HORA")
+
+	valorPorHora, parseErr := strconv.ParseFloat(tarifaStr, 64)
+	if parseErr != nil {
+		return nil, rest_err.NewInternalServerError("Erro ao converter a tarifa por hora", parseErr)
+	}
+
+	// Calcular o tempo decorrido e o valor a ser cobrado
+	horaEntrada, timeErr := time.Parse(time.RFC3339, registro.GetHoraEntrada())
+	if timeErr != nil {
+		return nil, rest_err.NewInternalServerError("Erro ao processar hora de entrada", timeErr)
+	}
+	saida, timeErr := time.Parse(time.RFC3339, horaSaida)
+	if timeErr != nil {
+		return nil, rest_err.NewInternalServerError("Erro ao processar hora de saída", timeErr)
+	}
+	duracao := saida.Sub(horaEntrada)
+
+	horas := duracao.Hours()
+	if horas < 1 {
+		horas = 1
+	}
+	valorCobrado := valorPorHora * horas
+
+	// Atualizar o registro com os dados da saída
+	registro.RegistrarSaida(horaSaida, valorCobrado)
+	updatedRegistro, updateErr := s.RgRepo.UpdateRegistro(registro.(*model.RegistroEstacionamentoDomain))
+	if updateErr != nil {
+		return nil, updateErr
+	}
+
+	// Atualizar a vaga para o status "disponivel"
+	vaga, vagaErr := s.vagaRepo.FindVagaByID(registro.GetVagaID())
+	if vagaErr != nil {
+		return nil, vagaErr
+	}
+	vaga.(*model.VagaDomain).Status = "disponivel"
+	vaga.(*model.VagaDomain).UpdatedAt = time.Now().Format(time.RFC3339)
+	_, vagaUpdateErr := s.vagaRepo.UpdateVaga(vaga.(*model.VagaDomain))
+	if vagaUpdateErr != nil {
+		return nil, vagaUpdateErr
+	}
+
+	// Retornar o registro atualizado ou os dados do cálculo
+	return updatedRegistro, nil
 }
