@@ -56,11 +56,11 @@ func main() {
 	veiculoController := veiculo.NewVeiculoControllerInterface(veiculoService)
 
 	registroRepo := repository.NewRegistroEstacionamentoRepository()
-	registroService := service.NewRegistroEstacionamentoDomainService(registroRepo)
+	registroService := service.NewRegistroEstacionamentoDomainService(registroRepo,vagaRepo)
 	registroController := registro.NewRegistroControllerInterface(registroService)
 
 	agendamentoRepo := repository.NewAgendamentoRepository() // Novo repositório
-	agendamentoService := service.NewAgendamentoDomainService(agendamentoRepo) // Novo serviço
+	agendamentoService := service.NewAgendamentoDomainService(agendamentoRepo,vagaRepo,registroRepo) // Novo serviço
 	agendamentoController := agendamento.NewAgendamentoControllerInterface(agendamentoService, vagaService,registroService)
 
 	relatoriosService := service.NewRelatoriosService(registroRepo, vagaRepo)
