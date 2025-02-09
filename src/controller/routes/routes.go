@@ -87,6 +87,7 @@ func InitRoutes(
 			agendamentoRoutes.PUT("/:id", agendamentoController.UpdateAgendamento)
 			agendamentoRoutes.DELETE("/:id", agendamentoController.DeleteAgendamento)
 			agendamentoRoutes.POST("/entrada", agendamentoController.RegistrarEntrada)
+			agendamentoRoutes.POST("/saida/:registroID", agendamentoController.FinalizarEstacionamento)
 		}
 	}
 	relatoriosRoutes := r.Group("/relatorios")
