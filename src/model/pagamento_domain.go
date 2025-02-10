@@ -6,23 +6,29 @@ import (
 	"time"
 )
 
-// PagamentoDomainInterface define os métodos que a entidade Pagamento deve implementar
+type PaymentStatus string
+
+const (
+	PaymentStatusAberto     PaymentStatus = "Aberto"
+	PaymentStatusConcluido  PaymentStatus = "Concluido"
+	PaymentStatusCancelado  PaymentStatus = "Cancelado"
+)
 type PagamentoDomainInterface interface {
 	GetID() uint
 	GetRegistroID() uint
 	GetValorTotal() float64
 	GetMetodoPagamento() string
-	GetStatus() string
+	GetStatus() PaymentStatus
 	GetCreatedAt() string
 	GetUpdatedAt() string
 	GetJSONValue() (string, error)
 	SetID(id uint)
-	AtualizarStatus(status string)
+	AtualizarStatus(status PaymentStatus)
 	AtualizarMetodoPagamento(metodo string)
 }
 
 // NewPagamentoDomain cria uma nova instância de PagamentoDomain
-func NewPagamentoDomain(registroID uint, valorTotal float64, metodoPagamento string, status string) PagamentoDomainInterface {
+func NewPagamentoDomain(registroID uint, valorTotal float64, metodoPagamento string, status PaymentStatus) PagamentoDomainInterface {
 	pagamento := &PagamentoDomain{
 		RegistroID:      registroID,
 		ValorTotal:      valorTotal,
@@ -40,7 +46,7 @@ type PagamentoDomain struct {
 	RegistroID      uint    `json:"registro_id"`          // ID do registro relacionado
 	ValorTotal      float64 `json:"valor_total"`          // Valor total pago
 	MetodoPagamento string  `json:"metodo_pagamento"`    // Método de pagamento: "cartão", "dinheiro", etc.
-	Status          string  `json:"status"`              // Status do pagamento: "pendente", "concluído"
+	Status          PaymentStatus   `json:"status"`              // Status do pagamento: "pendente", "concluído"
 	CreatedAt       string  `json:"created_at"`
 	UpdatedAt       string  `json:"updated_at"`
 }
@@ -62,7 +68,7 @@ func (pd *PagamentoDomain) GetMetodoPagamento() string {
 	return pd.MetodoPagamento
 }
 
-func (pd *PagamentoDomain) GetStatus() string {
+func (pd *PagamentoDomain) GetStatus() PaymentStatus  {
 	return pd.Status
 }
 
@@ -89,7 +95,7 @@ func (pd *PagamentoDomain) SetID(id uint) {
 }
 
 // AtualizarStatus atualiza o status do pagamento
-func (pd *PagamentoDomain) AtualizarStatus(status string) {
+func (pd *PagamentoDomain) AtualizarStatus(status PaymentStatus ) {
 	pd.Status = status
 	pd.UpdatedAt = time.Now().Format(time.RFC3339)
 }
