@@ -89,6 +89,7 @@ func main() {
 			 agendamentoController,
 			  relatoriosController,
 			  calendarioController,
+			  pagamentoController,
 
 			)
 
