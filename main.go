@@ -18,6 +18,7 @@ import (
 	"meu-novo-projeto/src/model/repository"
 	"meu-novo-projeto/src/model/service"
 	"meu-novo-projeto/src/controller/calendario"
+	"meu-novo-projeto/src/controller/pagamento"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -68,6 +69,10 @@ func main() {
 
 
 	calendarioController := calendario.NewCalendarioController(registroService)
+
+	pagamentoRepo := repository.NewPagamentoRepository()
+	pagamentoService := service.NewPagamentoDomainService(pagamentoRepo)
+	pagamentoController := pagamento.NewPagamentoControllerInterface(pagamentoService)
 
 
 	router := gin.Default()
