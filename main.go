@@ -60,9 +60,7 @@ func main() {
 	registroService := service.NewRegistroEstacionamentoDomainService(registroRepo,vagaRepo)
 	registroController := registro.NewRegistroControllerInterface(registroService)
 
-	agendamentoRepo := repository.NewAgendamentoRepository() // Novo repositório
-	agendamentoService := service.NewAgendamentoDomainService(agendamentoRepo,vagaRepo,registroRepo) // Novo serviço
-	agendamentoController := agendamento.NewAgendamentoControllerInterface(agendamentoService, vagaService,registroService)
+
 
 	relatoriosService := service.NewRelatoriosService(registroRepo, vagaRepo)
 	relatoriosController := relatorios.NewRelatoriosController(relatoriosService)
@@ -73,6 +71,12 @@ func main() {
 	pagamentoRepo := repository.NewPagamentoRepository()
 	pagamentoService := service.NewPagamentoDomainService(pagamentoRepo)
 	pagamentoController := pagamento.NewPagamentoControllerInterface(pagamentoService)
+
+
+
+	agendamentoRepo := repository.NewAgendamentoRepository() // Novo repositório
+	agendamentoService := service.NewAgendamentoDomainService(agendamentoRepo,vagaRepo,registroRepo) // Novo serviço
+	agendamentoController := agendamento.NewAgendamentoControllerInterface(agendamentoService, vagaService,registroService,pagamentoService)
 
 
 	router := gin.Default()
