@@ -85,8 +85,30 @@ func (ac *agendamentoControllerInterface) FinalizarEstacionamento(c *gin.Context
 		return
 	}
 
+	// O resultado deve ser o registro atualizado; faça a conversão
+	registro, ok := resultado.(*model.RegistroEstacionamentoDomain)
+	if !ok {
+		c.JSON(http.StatusInternalServerError, gin.H{"message": "Erro ao processar o registro finalizado"})
+		return
+	}
+
+	// Agora, criar o registro de pagamento com status "Aberto"
+	// (Utilizando a constante PaymentStatusAberto definida no domínio)
+	pagamento := model.NewPagamentoDomain(
+		registro.GetID(),            // Associação ao registro finalizado
+		registro.GetValorCobrado(),  // Valor total calculado
+		"indefinido",                // Método de pagamento (pode ser ajustado conforme a lógica)
+		model.PaymentStatusAberto,   // Status do pagamento
+	)
+	createdPagamento, pagamentoErr := ac.pagamentoService.CreatePagamentoService(pagamento)
+	if pagamentoErr != nil {
+		c.JSON(pagamentoErr.Code, gin.H{"message": pagamentoErr.Message})
+		return
+	}
+
 	c.JSON(http.StatusOK, gin.H{
-		"message":   "Estacionamento finalizado com sucesso",
-		"resultado": resultado,
+		"message":    "Estacionamento finalizado com sucesso e pagamento aberto",
+		"registro":   registro,
+		"pagamento":  createdPagamento,
 	})
 }
