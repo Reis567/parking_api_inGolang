@@ -6,14 +6,19 @@ import (
 )
 
 // NewAgendamentoControllerInterface cria uma nova instância de AgendamentoControllerInterface
-func NewAgendamentoControllerInterface(agendamentoService service.AgendamentoDomainService, vagaService service.VagaDomainService , registroService service.RegistroEstacionamentoDomainService) AgendamentoControllerInterface {
+func NewAgendamentoControllerInterface(
+	agendamentoService service.AgendamentoDomainService, 
+	vagaService service.VagaDomainService, 
+	registroService service.RegistroEstacionamentoDomainService,
+	pagamentoService service.PagamentoDomainService,
+) AgendamentoControllerInterface {
 	return &agendamentoControllerInterface{
-		service:     agendamentoService,
-		vagaService: vagaService,
-		registroService : registroService,
+		service:          agendamentoService,
+		vagaService:      vagaService,
+		registroService:  registroService,
+		pagamentoService: pagamentoService,
 	}
 }
-
 
 // AgendamentoControllerInterface define os métodos do controlador de agendamento
 type AgendamentoControllerInterface interface {
@@ -22,13 +27,14 @@ type AgendamentoControllerInterface interface {
 	FindAllAgendamentos(c *gin.Context)
 	UpdateAgendamento(c *gin.Context)
 	DeleteAgendamento(c *gin.Context)
-	RegistrarEntrada(c *gin.Context) 
+	RegistrarEntrada(c *gin.Context)
 	FinalizarEstacionamento(c *gin.Context)
 }
 
 // agendamentoControllerInterface implementa AgendamentoControllerInterface
 type agendamentoControllerInterface struct {
-	service     service.AgendamentoDomainService
-	vagaService service.VagaDomainService
-	registroService service.RegistroEstacionamentoDomainService
+	service          service.AgendamentoDomainService
+	vagaService      service.VagaDomainService
+	registroService  service.RegistroEstacionamentoDomainService
+	pagamentoService service.PagamentoDomainService
 }

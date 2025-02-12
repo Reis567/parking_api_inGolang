@@ -106,6 +106,6 @@ func InitRoutes(
 	{
 		pagamentoRoutes.POST("/", pagamentoController.CreatePagamento)
 		pagamentoRoutes.PUT("/:id", pagamentoController.UpdatePagamento)
-		// Outras rotas (GET, DELETE) podem ser adicionadas conforme necessário.
+
 	}
 }
