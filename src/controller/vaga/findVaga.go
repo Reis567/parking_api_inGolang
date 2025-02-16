@@ -33,3 +33,23 @@ func (vc *vagaControllerInterface) FindAllVagas(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"vagas": vagas})
 }
+
+
+
+// BuscarVagasDisponiveis retorna a vaga disponível para o tipo informado.
+// Exemplo de uso: GET /vagas/disponiveis?tipo=carro
+func (vc *vagaControllerInterface) BuscarVagasDisponiveis(c *gin.Context) {
+	tipo := c.Query("tipo")
+	if tipo == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"message": "O parâmetro 'tipo' é obrigatório"})
+		return
+	}
+
+	vaga, err := vc.service.BuscarVagaDisponivelService(tipo)
+	if err != nil {
+		c.JSON(err.Code, gin.H{"message": err.Message})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"vaga_disponivel": vaga})
+}
