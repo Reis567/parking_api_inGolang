@@ -19,6 +19,7 @@ type VagaControllerInterface interface {
 	FindAllVagas(c *gin.Context)
 	UpdateVaga(c *gin.Context)
 	DeleteVaga(c *gin.Context)
+	BuscarVagasDisponiveis(c *gin.Context)
 }
 
 // vagaControllerInterface implementa VagaControllerInterface
