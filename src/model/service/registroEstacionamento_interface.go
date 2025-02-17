@@ -28,6 +28,7 @@ type RegistroEstacionamentoDomainService interface {
 	UpdateRegistroService(registro model.RegistroEstacionamentoDomainInterface) (model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr)
 	DeleteRegistroService(id uint) *rest_err.RestErr
 	FindRegistrosPorDataService(data time.Time) ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) 
+	FindHistoricoRegistrosService(dataInicio, dataFim time.Time, placa, status string) ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr)
 
 }
 func (s *registroEstacionamentoDomainService) CreateRegistroService(registro model.RegistroEstacionamentoDomainInterface) (model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) {
@@ -123,15 +124,30 @@ func (s *registroEstacionamentoDomainService) FindRegistrosPorDataService(data t
 }
 
 
-func (s *registroEstacionamentoDomainService) FindRegistrosPorPeriodoService(dataInicio, dataFim time.Time) ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) {
-    logger.Info("Init FindRegistrosPorPeriodo service", zap.Time("dataInicio", dataInicio), zap.Time("dataFim", dataFim))
+func (s *registroEstacionamentoDomainService) FindHistoricoRegistrosService(dataInicio, dataFim time.Time, placa, status string) ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) {
+    logger.Info("Init FindHistoricoRegistrosService", zap.Time("dataInicio", dataInicio), zap.Time("dataFim", dataFim), zap.String("placa", placa), zap.String("status", status))
 
+    // Buscar registros pelo período
     registros, err := s.repo.FindRegistrosPorPeriodo(dataInicio, dataFim)
     if err != nil {
         logger.Error("Erro ao buscar registros por período", zap.Error(err))
         return nil, err
     }
 
-    logger.Info("Registros encontrados com sucesso", zap.Int("count", len(registros)))
-    return registros, nil
+    // Filtrar adicionalmente por placa e status, se fornecidos
+    var filtrados []model.RegistroEstacionamentoDomainInterface
+    for _, registro := range registros {
+        // Se a placa for informada e não coincidir, pular
+        if placa != "" && registro.GetPlaca() != placa {
+            continue
+        }
+        // Se o status for informado e não coincidir, pular
+        if status != "" && registro.GetStatus() != status {
+            continue
+        }
+        filtrados = append(filtrados, registro)
+    }
+
+    logger.Info("Registros filtrados encontrados", zap.Int("count", len(filtrados)))
+    return filtrados, nil
 }
