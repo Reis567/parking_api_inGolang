@@ -123,3 +123,15 @@ func (s *registroEstacionamentoDomainService) FindRegistrosPorDataService(data t
 }
 
 
+func (s *registroEstacionamentoDomainService) FindRegistrosPorPeriodoService(dataInicio, dataFim time.Time) ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) {
+    logger.Info("Init FindRegistrosPorPeriodo service", zap.Time("dataInicio", dataInicio), zap.Time("dataFim", dataFim))
+
+    registros, err := s.repo.FindRegistrosPorPeriodo(dataInicio, dataFim)
+    if err != nil {
+        logger.Error("Erro ao buscar registros por período", zap.Error(err))
+        return nil, err
+    }
+
+    logger.Info("Registros encontrados com sucesso", zap.Int("count", len(registros)))
+    return registros, nil
+}
