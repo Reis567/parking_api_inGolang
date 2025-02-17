@@ -49,6 +49,7 @@ func InitRoutes(
 			vagaRoutes.GET("/", vagaController.FindAllVagas)
 			vagaRoutes.PUT("/:id", vagaController.UpdateVaga)
 			vagaRoutes.DELETE("/:id", vagaController.DeleteVaga)
+			vagaRoutes.GET("/disponiveis", vagaController.BuscarVagasDisponiveis)
 		}
 	}
 
