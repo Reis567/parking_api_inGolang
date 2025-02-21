@@ -112,3 +112,80 @@ func extrairMaisFrequentes(frequencia map[string]int) []string {
 	}
 	return veiculos
 }
+
+
+
+func (s *relatoriosService) CalcularLotacaoHistorica(periodo, tipo string) (float64, *rest_err.RestErr) {
+	now := time.Now()
+	var inicio time.Time
+
+	// Determinar a data de início com base no período solicitado
+	switch periodo {
+	case "diario":
+		// Início do dia atual
+		inicio = time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location())
+	case "semanal":
+		// 7 dias atrás
+		inicio = now.AddDate(0, 0, -7)
+	case "mensal":
+		// 30 dias atrás
+		inicio = now.AddDate(0, 0, -30)
+	default:
+		return 0, rest_err.NewBadRequestError("Periodo inválido. Use 'diario', 'semanal' ou 'mensal'.")
+	}
+	fim := now
+
+	// Obter os registros de estacionamento no período
+	registros, err := s.registroRepo.FindRegistrosPorPeriodo(inicio, fim)
+	if err != nil {
+		return 0, err
+	}
+
+	// Criar um conjunto de IDs únicos de vagas que foram utilizadas no período
+	uniqueVagas := make(map[uint]struct{})
+	for _, reg := range registros {
+		uniqueVagas[reg.GetVagaID()] = struct{}{}
+	}
+
+	var totalVagas int
+	var usadas int
+
+	if tipo != "" {
+		// Se o filtro por tipo for informado, buscar todas as vagas e filtrar pelo tipo
+		vagas, repoErr := s.vagaRepo.FindAllVagas()
+		if repoErr != nil {
+			return 0, repoErr
+		}
+
+		// Filtrar as vagas que possuem o tipo desejado
+		filteredVagas := make(map[uint]struct{})
+		for _, vaga := range vagas {
+			if vaga.GetTipo() == tipo {
+				filteredVagas[vaga.GetID()] = struct{}{}
+			}
+		}
+		totalVagas = len(filteredVagas)
+		// Contar quantas das vagas utilizadas estão entre as vagas filtradas
+		for id := range uniqueVagas {
+			if _, ok := filteredVagas[id]; ok {
+				usadas++
+			}
+		}
+	} else {
+		// Sem filtro de tipo, contar todas as vagas disponíveis
+		var countErr *rest_err.RestErr
+		totalVagas, countErr = s.vagaRepo.CountTotalVagas()
+		if countErr != nil {
+			return 0, countErr
+		}
+		usadas = len(uniqueVagas)
+	}
+
+	if totalVagas == 0 {
+		return 0, rest_err.NewNotFoundError("Nenhuma vaga encontrada para o filtro informado")
+	}
+
+	// Calcular a taxa de ocupação (porcentagem de vagas utilizadas)
+	ocupacao := (float64(usadas) / float64(totalVagas)) * 100.0
+	return ocupacao, nil
+}
