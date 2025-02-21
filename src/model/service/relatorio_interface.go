@@ -16,6 +16,7 @@ type RelatoriosService interface {
 	CalcularReceita(inicio, fim time.Time) (float64, *rest_err.RestErr)
 	CalcularOcupacaoAtual() (float64, *rest_err.RestErr)
 	VeiculosMaisFrequentes(inicio, fim time.Time) ([]string, *rest_err.RestErr)
+	CalcularLotacaoHistorica(periodo, tipo string) (float64, *rest_err.RestErr)
 }
 
 
