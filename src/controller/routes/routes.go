@@ -98,6 +98,7 @@ func InitRoutes(
 		relatoriosRoutes.GET("/financeiro", relatoriosController.CalcularReceita)
 		relatoriosRoutes.GET("/ocupacao", relatoriosController.CalcularOcupacaoAtual)
 		relatoriosRoutes.GET("/veiculos", relatoriosController.VeiculosMaisFrequentes)
+		relatoriosRoutes.GET("/lotacao", relatoriosController.CalcularLotacao)
 	}
 	calendarioRoutes := r.Group("/calendario")
 	{
