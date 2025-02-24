@@ -16,7 +16,7 @@ func NewPagamentoControllerInterface(serviceInterface service.PagamentoDomainSer
 type PagamentoControllerInterface interface {
 	CreatePagamento(c *gin.Context)
 	UpdatePagamento(c *gin.Context)
-	// Outros métodos (por exemplo, FindPagamentoByID, DeletePagamento, etc.) podem ser adicionados conforme necessário.
+	FindPagamentosHistorico(c *gin.Context)
 }
 
 // pagamentoControllerInterface implementa PagamentoControllerInterface
