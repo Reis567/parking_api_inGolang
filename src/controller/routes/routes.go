@@ -108,6 +108,7 @@ func InitRoutes(
 	{
 		pagamentoRoutes.POST("/", pagamentoController.CreatePagamento)
 		pagamentoRoutes.PUT("/:id", pagamentoController.UpdatePagamento)
+		pagamentoRoutes.GET("/historico", pagamentoController.FindPagamentosHistorico)
 
 	}
 }
