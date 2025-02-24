@@ -5,6 +5,7 @@ import (
 	"meu-novo-projeto/src/model"
 	"meu-novo-projeto/src/model/repository"
 	"go.uber.org/zap"
+	"time"
 
 )
 
@@ -12,7 +13,7 @@ import (
 type PagamentoDomainService interface {
 	// Cria um novo pagamento
 	CreatePagamentoService(pagamento model.PagamentoDomainInterface) (model.PagamentoDomainInterface, *rest_err.RestErr)
-	// Atualiza um pagamento existente, podendo alterar o status (por exemplo, para "Concluído" ou "Cancelado")
+	FindPagamentosHistoricoService(inicio, fim time.Time, status, metodo string) ([]model.PagamentoDomainInterface, *rest_err.RestErr)
 	UpdatePagamentoService(pagamento model.PagamentoDomainInterface) (model.PagamentoDomainInterface, *rest_err.RestErr)
 }
 
@@ -54,4 +55,18 @@ func (s *pagamentoDomainService) UpdatePagamentoService(pagamento model.Pagament
 
 	zap.L().Info("Pagamento atualizado com sucesso", zap.Uint("pagamento_id", updatedPagamento.GetID()))
 	return updatedPagamento, nil
+}
+
+
+func (s *pagamentoDomainService) FindPagamentosHistoricoService(inicio, fim time.Time, status, metodo string) ([]model.PagamentoDomainInterface, *rest_err.RestErr) {
+	zap.L().Info("Iniciando busca de pagamentos históricos", zap.Time("inicio", inicio), zap.Time("fim", fim), zap.String("status", status), zap.String("metodo", metodo))
+	
+	pagamentos, err := s.pagamentoRepo.FindPagamentosPorPeriodo(inicio, fim, status, metodo)
+	if err != nil {
+		zap.L().Error("Erro ao buscar pagamentos históricos", zap.Error(err))
+		return nil, err
+	}
+
+	zap.L().Info("Pagamentos históricos encontrados", zap.Int("total", len(pagamentos)))
+	return pagamentos, nil
 }
