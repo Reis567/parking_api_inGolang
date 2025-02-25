@@ -29,7 +29,8 @@ type AgendamentoRepository interface {
 	FindAllAgendamentos() ([]model.AgendamentoDomainInterface, *rest_err.RestErr)
 	UpdateAgendamento(agendamento *model.AgendamentoDomain) (*model.AgendamentoDomain, *rest_err.RestErr)
 	DeleteAgendamento(id uint) *rest_err.RestErr
-	VerificarReservaPorPlaca(placa string) (model.AgendamentoDomainInterface, *rest_err.RestErr) // Novo método
+	VerificarReservaPorPlaca(placa string) (model.AgendamentoDomainInterface, *rest_err.RestErr)
+	FindAgendamentosByStatus(status string) ([]model.AgendamentoDomainInterface, *rest_err.RestErr)
 }
 
 
@@ -116,4 +117,27 @@ func (r *agendamentoRepository) VerificarReservaPorPlaca(placa string) (model.Ag
 	}
 
 	return &reserva, nil
+}
+
+
+// Na interface AgendamentoRepository, adicione:
+
+
+// Implementação:
+func (r *agendamentoRepository) FindAgendamentosByStatus(status string) ([]model.AgendamentoDomainInterface, *rest_err.RestErr) {
+	var agendamentos []model.AgendamentoDomain
+
+	// Buscar agendamentos cujo status seja o informado
+	if err := r.db.Where("status = ?", status).Find(&agendamentos).Error; err != nil {
+		log.Printf("Erro ao buscar agendamentos com status %s: %v", status, err)
+		return nil, rest_err.NewInternalServerError("Erro ao buscar reservas", err)
+	}
+
+	// Converter para a interface
+	agendamentoInterfaces := make([]model.AgendamentoDomainInterface, len(agendamentos))
+	for i, a := range agendamentos {
+		agendamentoInterfaces[i] = &a
+	}
+
+	return agendamentoInterfaces, nil
 }
