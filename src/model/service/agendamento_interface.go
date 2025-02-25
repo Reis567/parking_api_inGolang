@@ -29,10 +29,10 @@ type AgendamentoDomainService interface {
 	FindAllAgendamentosService() ([]model.AgendamentoDomainInterface, *rest_err.RestErr)
 	UpdateAgendamentoService(agendamento model.AgendamentoDomainInterface) (model.AgendamentoDomainInterface, *rest_err.RestErr)
 	DeleteAgendamentoService(id uint) *rest_err.RestErr
-	//FindAgendamentosByPeriod(inicio, fim time.Time) ([]model.AgendamentoDomainInterface, *rest_err.RestErr)
-	//CancelAgendamentoService(id uint) *rest_err.RestErr
 	VerificarReservaPorPlacaService(placa string) (model.AgendamentoDomainInterface, *rest_err.RestErr)
 	FinalizarEstacionamentoService(registroID uint, horaSaida string) (interface{}, *rest_err.RestErr)
+	FindReservasAtivasService(status string) ([]model.AgendamentoDomainInterface, *rest_err.RestErr)
+
 }
 
 
@@ -195,4 +195,21 @@ func (s *agendamentoDomainService) FinalizarEstacionamentoService(registroID uin
 
 	// Retornar o registro atualizado ou os dados do cálculo
 	return updatedRegistro, nil
+}
+
+
+// Na interface AgendamentoDomainService, adicione:
+
+// Implementação:
+func (s *agendamentoDomainService) FindReservasAtivasService(status string) ([]model.AgendamentoDomainInterface, *rest_err.RestErr) {
+	logger.Info("Buscando reservas ativas", zap.String("status", status))
+
+	reservas, err := s.agendamentoRepository.FindAgendamentosByStatus(status)
+	if err != nil {
+		logger.Error("Erro ao buscar reservas ativas", zap.Error(err))
+		return nil, err
+	}
+
+	logger.Info("Reservas encontradas", zap.Int("total", len(reservas)))
+	return reservas, nil
 }
