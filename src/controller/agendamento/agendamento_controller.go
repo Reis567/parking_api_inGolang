@@ -29,6 +29,7 @@ type AgendamentoControllerInterface interface {
 	DeleteAgendamento(c *gin.Context)
 	RegistrarEntrada(c *gin.Context)
 	FinalizarEstacionamento(c *gin.Context)
+	Reservas(c *gin.Context)
 }
 
 // agendamentoControllerInterface implementa AgendamentoControllerInterface

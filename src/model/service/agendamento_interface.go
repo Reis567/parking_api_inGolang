@@ -198,9 +198,7 @@ func (s *agendamentoDomainService) FinalizarEstacionamentoService(registroID uin
 }
 
 
-// Na interface AgendamentoDomainService, adicione:
 
-// Implementação:
 func (s *agendamentoDomainService) FindReservasAtivasService(status string) ([]model.AgendamentoDomainInterface, *rest_err.RestErr) {
 	logger.Info("Buscando reservas ativas", zap.String("status", status))
 

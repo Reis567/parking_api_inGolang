@@ -35,3 +35,21 @@ func (ac *agendamentoControllerInterface) FindAllAgendamentos(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": agendamentos})
 }
+
+
+func (ac *agendamentoControllerInterface) Reservas(c *gin.Context) {
+	// Ler o parâmetro de query "status". Se não informado, utiliza "confirmada" como padrão.
+	status := c.Query("status")
+	if status == "" {
+		status = "confirmada"
+	}
+
+	// Chama o service para buscar as reservas ativas com o status informado
+	reservas, err := ac.service.FindReservasAtivasService(status)
+	if err != nil {
+		c.JSON(err.Code, gin.H{"message": err.Message})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"reservas": reservas})
+}
