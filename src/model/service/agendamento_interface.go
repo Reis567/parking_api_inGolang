@@ -32,6 +32,7 @@ type AgendamentoDomainService interface {
 	VerificarReservaPorPlacaService(placa string) (model.AgendamentoDomainInterface, *rest_err.RestErr)
 	FinalizarEstacionamentoService(registroID uint, horaSaida string) (interface{}, *rest_err.RestErr)
 	FindReservasAtivasService(status string) ([]model.AgendamentoDomainInterface, *rest_err.RestErr)
+	CancelAgendamentoService(id uint, justificativa string) (model.AgendamentoDomainInterface, *rest_err.RestErr)
 
 }
 
@@ -210,4 +211,33 @@ func (s *agendamentoDomainService) FindReservasAtivasService(status string) ([]m
 
 	logger.Info("Reservas encontradas", zap.Int("total", len(reservas)))
 	return reservas, nil
+}
+
+
+func (s *agendamentoDomainService) CancelAgendamentoService(id uint, justificativa string) (model.AgendamentoDomainInterface, *rest_err.RestErr) {
+	logger.Info("Iniciando cancelamento do agendamento",
+		zap.Uint("agendamento_id", id),
+		zap.String("justificativa", justificativa),
+	)
+
+	// Buscar o agendamento existente
+	agendamento, err := s.agendamentoRepository.FindAgendamentoByID(id)
+	if err != nil {
+		logger.Error("Erro ao buscar agendamento para cancelamento", zap.Error(err))
+		return nil, err
+	}
+
+	// Atualizar o status para "cancelado"
+	agendamento.AtualizarStatus("cancelado")
+	// Se desejar registrar a justificativa, você pode adicioná-la a um log ou, se houver campo apropriado, atribuí-la.
+
+	// Persistir a atualização
+	updatedAgendamento, updateErr := s.agendamentoRepository.UpdateAgendamento(agendamento.(*model.AgendamentoDomain))
+	if updateErr != nil {
+		logger.Error("Erro ao atualizar agendamento para cancelamento", zap.Error(updateErr))
+		return nil, updateErr
+	}
+
+	logger.Info("Agendamento cancelado com sucesso", zap.Uint("agendamento_id", updatedAgendamento.GetID()))
+	return updatedAgendamento, nil
 }
