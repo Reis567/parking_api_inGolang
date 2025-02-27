@@ -92,6 +92,7 @@ func InitRoutes(
 			agendamentoRoutes.POST("/entrada", agendamentoController.RegistrarEntrada)
 			agendamentoRoutes.POST("/saida/:registroID", agendamentoController.FinalizarEstacionamento)
 			agendamentoRoutes.GET("/reservas", agendamentoController.Reservas)
+			agendamentoRoutes.POST("/cancelar/:id", agendamentoController.CancelAgendamento)
 		}
 	}
 	relatoriosRoutes := r.Group("/relatorios")
