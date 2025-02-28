@@ -112,3 +112,19 @@ func (r *veiculoRepository) DeleteVeiculo(id uint) *rest_err.RestErr {
 	log.Printf("Veículo excluído com sucesso: ID %d", id)
 	return nil
 }
+
+
+func (r *veiculoRepository) FindVeiculosAtivos() ([]model.VehicleDomainInterface, *rest_err.RestErr) {
+	var veiculos []model.VehicleDomain
+	if err := r.db.Where("status = ?", "estacionado").Find(&veiculos).Error; err != nil {
+		log.Printf("Erro ao buscar veículos ativos: %v", err)
+		return nil, rest_err.NewInternalServerError("Erro ao buscar veículos ativos", err)
+	}
+
+	// Converter para interface
+	veiculoInterfaces := make([]model.VehicleDomainInterface, len(veiculos))
+	for i, v := range veiculos {
+		veiculoInterfaces[i] = &v
+	}
+	return veiculoInterfaces, nil
+}
