@@ -29,6 +29,7 @@ type VeiculoRepository interface {
 	FindAllVeiculos() ([]model.VehicleDomainInterface, *rest_err.RestErr)
 	UpdateVeiculo(veiculo *model.VehicleDomain) (*model.VehicleDomain, *rest_err.RestErr)
 	DeleteVeiculo(id uint) *rest_err.RestErr
+	FindVeiculosAtivos() ([]model.VehicleDomainInterface, *rest_err.RestErr)
 }
 func (r *veiculoRepository) CreateVeiculo(veiculo model.VehicleDomainInterface) (model.VehicleDomainInterface, *rest_err.RestErr) {
 	if err := r.db.Create(veiculo).Error; err != nil {
