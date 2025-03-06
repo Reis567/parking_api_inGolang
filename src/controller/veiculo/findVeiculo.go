@@ -35,3 +35,12 @@ func (vc *veiculoControllerInterface) FindAllVeiculos(c *gin.Context) {
 }
 
 
+
+func (vc *veiculoControllerInterface) FindVeiculosAtivos(c *gin.Context) {
+	veiculos, err := vc.service.FindAllVeiculosAtivosService()
+	if err != nil {
+		c.JSON(err.Code, gin.H{"message": err.Message})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"veiculos_ativos": veiculos})
+}
