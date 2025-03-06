@@ -25,6 +25,7 @@ type VehicleDomainService interface {
 	FindAllVehiclesService() ([]model.VehicleDomainInterface, *rest_err.RestErr)
 	UpdateVehicleService(vehicle model.VehicleDomainInterface) (model.VehicleDomainInterface, *rest_err.RestErr)
 	DeleteVehicleService(id uint) *rest_err.RestErr
+	FindAllVeiculosAtivosService() ([]model.VehicleDomainInterface, *rest_err.RestErr)
 }
 
 func (s *vehicleDomainService) CreateVehicleService(vehicle model.VehicleDomainInterface) (model.VehicleDomainInterface, *rest_err.RestErr) {
