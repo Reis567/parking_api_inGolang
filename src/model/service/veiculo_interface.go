@@ -112,3 +112,15 @@ func (s *vehicleDomainService) DeleteVehicleService(id uint) *rest_err.RestErr {
 	logger.Info("Veículo excluído com sucesso", zap.Uint("vehicle_id", id))
 	return nil
 }
+
+
+func (s *vehicleDomainService) FindAllVeiculosAtivosService() ([]model.VehicleDomainInterface, *rest_err.RestErr) {
+	logger.Info("Iniciando busca por veículos ativos")
+	veiculos, err := s.vehicleRepository.FindVeiculosAtivos()
+	if err != nil {
+		logger.Error("Erro ao buscar veículos ativos", zap.Error(err))
+		return nil, err
+	}
+	logger.Info("Veículos ativos encontrados", zap.Int("total", len(veiculos)))
+	return veiculos, nil
+}

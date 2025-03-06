@@ -63,6 +63,7 @@ func InitRoutes(
 			vehicleRoutes.GET("/", veiculoController.FindAllVeiculos)
 			vehicleRoutes.PUT("/:id", veiculoController.UpdateVeiculo)
 			vehicleRoutes.DELETE("/:id", veiculoController.DeleteVeiculo)
+			
 		}
 	}
 
