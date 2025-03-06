@@ -19,6 +19,7 @@ type VeiculoControllerInterface interface {
 	FindAllVeiculos(c *gin.Context)
 	UpdateVeiculo(c *gin.Context)
 	DeleteVeiculo(c *gin.Context)
+	FindVeiculosAtivos(c *gin.Context)
 }
 
 // veiculoControllerInterface implementa VeiculoControllerInterface
