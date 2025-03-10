@@ -55,11 +55,3 @@
 
 ---
 
-### Resumo
-
-Essas rotas complementam as operações essenciais (entrada, saída, pagamento) e adicionam funcionalidades de consulta e relatórios, permitindo:
-
-- **Monitoramento histórico:** Verificar o fluxo de veículos e pagamentos em períodos específicos.
-- **Análise de ocupação:** Obter dados sobre a lotação e desempenho financeiro do estacionamento.
-- **Gerenciamento de reservas:** Consultar e cancelar agendamentos conforme necessário.
-- **Visão operacional:** Listar veículos atualmente estacionados para monitoramento em tempo real.
