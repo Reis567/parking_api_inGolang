@@ -190,3 +190,17 @@ func (s *relatoriosService) CalcularLotacaoHistorica(periodo, tipo string) (floa
 	ocupacao := (float64(usadas) / float64(totalVagas)) * 100.0
 	return ocupacao, nil
 }
+
+
+func (s *relatoriosService) CalcularTempoMedioPermanencia(inicio, fim time.Time) (float64, *rest_err.RestErr) {
+	logger.Info("Iniciando cálculo do tempo médio de permanência", zap.Time("inicio", inicio), zap.Time("fim", fim))
+
+	tempoMedio, err := s.registroRepo.CalcularTempoMedioPermanencia(inicio, fim)
+	if err != nil {
+		logger.Error("Erro ao calcular tempo médio de permanência", zap.Error(err))
+		return 0, err
+	}
+
+	logger.Info("Tempo médio de permanência calculado com sucesso", zap.Float64("tempoMedio", tempoMedio))
+	return tempoMedio, nil
+}
