@@ -23,16 +23,19 @@ type RelatoriosService interface {
 
 type relatoriosService struct {
 	registroRepo repository.RegistroEstacionamentoRepository // Atualizado para usar a interface do repositório
-	vagaRepo     repository.VagaRepository                   // Atualizado para usar a interface do repositório
+	vagaRepo     repository.VagaRepository        
+	relatorioRepo     repository.RelatoriosRepository  
 }
 
 func NewRelatoriosService(
 	registroRepo repository.RegistroEstacionamentoRepository,
 	vagaRepo repository.VagaRepository,
+	relatorioRepo repository.RelatoriosRepository,
 ) RelatoriosService {
 	return &relatoriosService{
 		registroRepo: registroRepo,
 		vagaRepo:     vagaRepo,
+		relatorioRepo:     relatorioRepo,
 	}
 }
 
@@ -195,7 +198,7 @@ func (s *relatoriosService) CalcularLotacaoHistorica(periodo, tipo string) (floa
 func (s *relatoriosService) CalcularTempoMedioPermanencia(inicio, fim time.Time) (float64, *rest_err.RestErr) {
 	logger.Info("Iniciando cálculo do tempo médio de permanência", zap.Time("inicio", inicio), zap.Time("fim", fim))
 
-	tempoMedio, err := s.CalcularTempoMedioPermanencia(inicio, fim)
+	tempoMedio, err := s.relatorioRepo.CalcularTempoMedioPermanencia(inicio, fim)
 	if err != nil {
 		logger.Error("Erro ao calcular tempo médio de permanência", zap.Error(err))
 		return 0, err
