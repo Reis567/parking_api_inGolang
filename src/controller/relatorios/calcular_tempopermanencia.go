@@ -24,7 +24,6 @@ func (rc *relatoriosController) CalcularTempoMedioPermanencia(c *gin.Context) {
 		return
 	}
 
-	// Chama o serviço para calcular o tempo médio
 	tempoMedio, errResp := rc.service.CalcularTempoMedioPermanencia(inicio, fim)
 	if errResp != nil {
 		c.JSON(errResp.Code, gin.H{"erro": errResp.Message})
