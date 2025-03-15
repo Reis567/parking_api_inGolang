@@ -102,6 +102,8 @@ func InitRoutes(
 		relatoriosRoutes.GET("/ocupacao", relatoriosController.CalcularOcupacaoAtual)
 		relatoriosRoutes.GET("/veiculos", relatoriosController.VeiculosMaisFrequentes)
 		relatoriosRoutes.GET("/lotacao", relatoriosController.CalcularLotacao)
+		relatoriosRoutes.GET("/tempo-medio-permanencia", relatoriosController.CalcularTempoMedioPermanencia)
+
 	}
 	calendarioRoutes := r.Group("/calendario")
 	{

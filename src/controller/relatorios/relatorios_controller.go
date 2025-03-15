@@ -18,6 +18,7 @@ type RelatoriosController interface {
 	CalcularOcupacaoAtual(c *gin.Context)
 	VeiculosMaisFrequentes(c *gin.Context)
 	CalcularLotacao(c *gin.Context)
+	CalcularTempoMedioPermanencia(c *gin.Context)
 }
 
 // relatoriosController implementa RelatoriosController
