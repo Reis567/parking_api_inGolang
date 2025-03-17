@@ -4,6 +4,7 @@ import (
 	"log"
 	"time"
 
+	"meu-novo-projeto/src/configuration/database"
 	"meu-novo-projeto/src/configuration/rest_err"
 	"meu-novo-projeto/src/model"
 	"gorm.io/gorm"
@@ -14,9 +15,14 @@ type relatoriosRepository struct {
 	db *gorm.DB
 }
 
-// NewRelatoriosRepository cria uma nova instância de relatoriosRepository
-func NewRelatoriosRepository(db *gorm.DB) RelatoriosRepository {
-	return &relatoriosRepository{db: db}
+// NewRelatoriosRepository cria uma nova instância de relatoriosRepository usando o banco de dados padrão
+func NewRelatoriosRepository() RelatoriosRepository {
+	return &relatoriosRepository{db: database.DB}
+}
+
+// NewRelatoriosRepositoryWithDB cria uma nova instância de relatoriosRepository com um banco de dados personalizado (para testes)
+func NewRelatoriosRepositoryWithDB(customDB *gorm.DB) RelatoriosRepository {
+	return &relatoriosRepository{db: customDB}
 }
 
 // RelatoriosRepository define os métodos para consultas relacionadas a relatórios
@@ -26,6 +32,7 @@ type RelatoriosRepository interface {
 	CountTotalVagas() (int, *rest_err.RestErr)
 	CalcularTempoMedioPermanencia(inicio, fim time.Time) (float64, *rest_err.RestErr)
 }
+
 
 
 func (r *relatoriosRepository) FindRegistrosPorPeriodo(inicio, fim time.Time) ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) {
