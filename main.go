@@ -61,8 +61,8 @@ func main() {
 	registroController := registro.NewRegistroControllerInterface(registroService)
 
 
-
-	relatoriosService := service.NewRelatoriosService(registroRepo, vagaRepo)
+	relatorioRepo := repository.NewRelatoriosRepository()
+	relatoriosService := service.NewRelatoriosService(registroRepo, vagaRepo,relatorioRepo)
 	relatoriosController := relatorios.NewRelatoriosController(relatoriosService)
 
 
