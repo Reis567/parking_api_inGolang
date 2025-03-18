@@ -20,6 +20,7 @@ type UserControllerInterface interface {
 	DeleteUser(c *gin.Context)
 	UpdateUser(c *gin.Context)
 	LoginUser(c *gin.Context)
+	GetCurrentUser(c *gin.Context)
 }
 
 // userControllerInterface implementa UserControllerInterface

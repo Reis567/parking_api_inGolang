@@ -6,6 +6,7 @@ import (
 	"go.uber.org/zap"
 	"strconv" 
 	"net/mail"
+
 )
 
 
@@ -77,3 +78,12 @@ func (uc *userControllerInterface) FindUserByID(c *gin.Context) {
 	})
 }
 
+func (uc *userControllerInterface) GetCurrentUser(c *gin.Context) {
+	userID := c.GetUint("user_id")
+	user, err := uc.service.FindUserByIDService(userID)
+	if err != nil {
+		c.JSON(err.Code, err)
+		return
+	}
+	c.JSON(200, user)
+}
