@@ -139,3 +139,17 @@ func (r *userRepository) GetCurrentUser(userID uint) (model.UserDomainInterface,
 	return &user, nil
 }
 
+func (r *userRepository) GetUserParkingHistory(userID uint) ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr) {
+	var registros []model.RegistroEstacionamentoDomain
+
+	if err := r.db.Where("user_id = ?", userID).Find(&registros).Error; err != nil {
+		log.Printf("Erro ao buscar histórico de estacionamento do usuário: %v", err)
+		return nil, rest_err.NewInternalServerError("Erro ao buscar histórico de estacionamento", err)
+	}
+
+	registrosInterface := make([]model.RegistroEstacionamentoDomainInterface, len(registros))
+	for i, registro := range registros {
+		registrosInterface[i] = &registro
+	}
+	return registrosInterface, nil
+}
