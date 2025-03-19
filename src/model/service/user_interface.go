@@ -169,3 +169,24 @@ func (s *userDomainService) GetUserParkingHistoryService(userID string) ([]model
     logger.Info("Histórico de estacionamento recuperado com sucesso", zap.String("userID", userID))
     return parkingHistory, nil
 }
+
+func (s *userDomainService) GetUserVehiclesService(userID string) ([]model.Vehicle, *rest_err.RestErr) {
+    logger.Info("Init GetUserVehiclesService", zap.String("userID", userID))
+
+    // Convertendo o ID para uint
+    idUint, err := strconv.Atoi(userID)
+    if err != nil {
+        logger.Error("ID inválido para recuperação de veículos", zap.String("userID", userID), zap.Error(err))
+        return nil, rest_err.NewBadRequestError("ID inválido. Deve ser um número inteiro.")
+    }
+
+    // Recupera os veículos do usuário
+    vehicles, dbErr := s.userRepository.GetUserVehicles(uint(idUint))
+    if dbErr != nil {
+        logger.Error("Erro ao recuperar veículos do usuário", zap.Error(dbErr))
+        return nil, dbErr
+    }
+
+    logger.Info("Veículos do usuário recuperados com sucesso", zap.String("userID", userID))
+    return vehicles, nil
+}
