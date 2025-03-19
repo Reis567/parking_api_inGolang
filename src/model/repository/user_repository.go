@@ -123,3 +123,19 @@ func (r *userRepository) DeleteUser(id uint) *rest_err.RestErr {
 	log.Printf("Usuário excluído com sucesso: ID %d", id)
 	return nil
 }
+
+
+func (r *userRepository) GetCurrentUser(userID uint) (model.UserDomainInterface, *rest_err.RestErr) {
+	var user model.UserDomain
+
+	if err := r.db.First(&user, userID).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, rest_err.NewNotFoundError("Usuário não encontrado")
+		}
+		log.Printf("Erro ao buscar usuário atual: %v", err)
+		return nil, rest_err.NewInternalServerError("Erro ao buscar usuário atual", err)
+	}
+
+	return &user, nil
+}
+

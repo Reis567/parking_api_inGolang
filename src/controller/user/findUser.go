@@ -87,3 +87,26 @@ func (uc *userControllerInterface) GetCurrentUser(c *gin.Context) {
 	}
 	c.JSON(200, user)
 }
+
+// Retorna o histórico de estacionamento do usuário
+func (uc *userControllerInterface) GetUserParkingHistory(c *gin.Context) {
+	userID := c.Param("id")
+	// Chamar serviço que retorna o histórico (exemplo fictício)
+	parkingHistory, err := uc.service.GetUserParkingHistoryService(userID)
+	if err != nil {
+		c.JSON(err.Code, err)
+		return
+	}
+	c.JSON(200, parkingHistory)
+}
+
+// Retorna os veículos cadastrados pelo usuário
+func (uc *userControllerInterface) GetUserVehicles(c *gin.Context) {
+	userID := c.Param("id")
+	vehicles, err := uc.service.GetUserVehiclesService(userID)
+	if err != nil {
+		c.JSON(err.Code, err)
+		return
+	}
+	c.JSON(200, vehicles)
+}
