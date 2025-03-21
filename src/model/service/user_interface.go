@@ -148,29 +148,21 @@ func (s *userDomainService) DeleteUserService(id string) *rest_err.RestErr {
 	return nil
 }
 
-
-func (s *userDomainService) GetUserParkingHistoryService(userID string) ([]model.ParkingHistory, *rest_err.RestErr) {
-    logger.Info("Init GetUserParkingHistoryService", zap.String("userID", userID))
-
-    // Convertendo o ID para uint
-    idUint, err := strconv.Atoi(userID)
-    if err != nil {
-        logger.Error("ID inválido para histórico de estacionamento", zap.String("userID", userID), zap.Error(err))
-        return nil, rest_err.NewBadRequestError("ID inválido. Deve ser um número inteiro.")
-    }
+func (s *userDomainService) GetUserParkingHistoryService(userID uint) ([]model.ParkingHistory, *rest_err.RestErr) {
+    logger.Info("Init GetUserParkingHistoryService", zap.Uint("userID", userID))
 
     // Recupera o histórico de estacionamento do usuário
-    parkingHistory, dbErr := s.userRepository.GetUserParkingHistory(uint(idUint))
+    parkingHistory, dbErr := s.userRepository.GetUserParkingHistory(userID)
     if dbErr != nil {
         logger.Error("Erro ao recuperar histórico de estacionamento", zap.Error(dbErr))
         return nil, dbErr
     }
 
-    logger.Info("Histórico de estacionamento recuperado com sucesso", zap.String("userID", userID))
+    logger.Info("Histórico de estacionamento recuperado com sucesso", zap.Uint("userID", userID))
     return parkingHistory, nil
 }
 
-func (s *userDomainService) GetUserVehiclesService(userID string) ([]model.Vehicle, *rest_err.RestErr) {
+func (s *userDomainService) GetUserVehiclesService(userID string) ([]model.VehicleDomainInterface, *rest_err.RestErr) {
     logger.Info("Init GetUserVehiclesService", zap.String("userID", userID))
 
     // Convertendo o ID para uint
@@ -187,6 +179,12 @@ func (s *userDomainService) GetUserVehiclesService(userID string) ([]model.Vehic
         return nil, dbErr
     }
 
+    // Converte []model.VehicleDomain para []model.VehicleDomainInterface
+    var vehicleInterfaces []model.VehicleDomainInterface
+    for _, v := range vehicles {
+        vehicleInterfaces = append(vehicleInterfaces, v)
+    }
+
     logger.Info("Veículos do usuário recuperados com sucesso", zap.String("userID", userID))
-    return vehicles, nil
+    return vehicleInterfaces, nil
 }

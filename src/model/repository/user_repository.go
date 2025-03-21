@@ -28,6 +28,8 @@ type UserRepository interface {
 	FindUserByID(id uint) (model.UserDomainInterface, *rest_err.RestErr)
 	UpdateUser(user *model.UserDomain) (*model.UserDomain, *rest_err.RestErr)
 	DeleteUser(id uint) *rest_err.RestErr
+	GetUserParkingHistory(userID uint) ([]model.RegistroEstacionamentoDomainInterface, *rest_err.RestErr)
+	GetUserVehicles(userID uint) ([]model.VehicleDomainInterface, *rest_err.RestErr) 
 }
 
 
