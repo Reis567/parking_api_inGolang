@@ -147,19 +147,31 @@ func (s *userDomainService) DeleteUserService(id string) *rest_err.RestErr {
 	logger.Info("Usuário excluído com sucesso", zap.String("user_id", id))
 	return nil
 }
+func (s *userDomainService) GetUserParkingHistoryService(userID string) ([]model.ParkingHistoryDomainInterface, *rest_err.RestErr) {
+    logger.Info("Init GetUserParkingHistoryService", zap.String("userID", userID))
 
-func (s *userDomainService) GetUserParkingHistoryService(userID uint) ([]model.ParkingHistory, *rest_err.RestErr) {
-    logger.Info("Init GetUserParkingHistoryService", zap.Uint("userID", userID))
+    // Convertendo o ID para uint
+    idUint, err := strconv.Atoi(userID)
+    if err != nil {
+        logger.Error("ID inválido para histórico de estacionamento", zap.String("userID", userID), zap.Error(err))
+        return nil, rest_err.NewBadRequestError("ID inválido. Deve ser um número inteiro.")
+    }
 
     // Recupera o histórico de estacionamento do usuário
-    parkingHistory, dbErr := s.userRepository.GetUserParkingHistory(userID)
+    parkingHistory, dbErr := s.userRepository.GetUserParkingHistory(uint(idUint))
     if dbErr != nil {
         logger.Error("Erro ao recuperar histórico de estacionamento", zap.Error(dbErr))
         return nil, dbErr
     }
 
-    logger.Info("Histórico de estacionamento recuperado com sucesso", zap.Uint("userID", userID))
-    return parkingHistory, nil
+    // Converte []model.ParkingHistoryDomain para []model.ParkingHistoryDomainInterface
+    var parkingHistoryInterfaces []model.ParkingHistoryDomainInterface
+    for _, ph := range parkingHistory {
+        parkingHistoryInterfaces = append(parkingHistoryInterfaces, ph)
+    }
+
+    logger.Info("Histórico de estacionamento recuperado com sucesso", zap.String("userID", userID))
+    return parkingHistoryInterfaces, nil
 }
 
 func (s *userDomainService) GetUserVehiclesService(userID string) ([]model.VehicleDomainInterface, *rest_err.RestErr) {
